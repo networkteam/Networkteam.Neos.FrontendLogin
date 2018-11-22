@@ -1,0 +1,36 @@
+##
+# A simple "Login form" plugin that demonstrates "Frontend authorization"
+#
+'Networkteam.Neos.FrontendLogin:LoginForm':
+  superTypes:
+    'Neos.Neos:Content': true
+  ui:
+    label: i18n
+    icon: 'icon-key'
+    inspector:
+      groups:
+        loginActions:
+          label: i18n
+          icon: 'icon-link'
+
+  properties:
+    redirectAfterLogin:
+      type: reference
+      ui:
+        label: i18n
+        reloadIfChanged: false
+        inspector:
+          group: 'loginActions'
+          editorOptions:
+            nodeTypes:
+              - 'Neos.Neos:Document'
+    redirectAfterLogout:
+      type: reference
+      ui:
+        label: i18n
+        reloadIfChanged: false
+        inspector:
+          group: 'loginActions'
+          editorOptions:
+            nodeTypes:
+              - 'Neos.Neos:Document'

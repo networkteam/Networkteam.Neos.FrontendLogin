@@ -1,0 +1,20 @@
+{
+    "name": "networkteam/neos-frontendlogin",
+    "description": "",
+    "type": "neos-package",
+    "require": {
+        "neos/flow": "*",
+        "neos/neos": "~4.0",
+        "networkteam/neos-util": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Networkteam\\Neos\\FrontendLogin\\": "Classes"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Networkteam.Neos.FrontendLogin"
+        }
+    }
+}

@@ -1,0 +1,42 @@
+Neos:
+  Flow:
+    security:
+      authentication:
+        providers:
+          'Neos.Neos:Backend':
+            requestPatterns:
+              'Neos.Neos.FrontendLogin:NeosBackend':
+                pattern: Networkteam\Neos\FrontendLogin\Security\NeosRequestPattern
+          'Networkteam.Neos.FrontendLogin:Frontend':
+            provider: PersistedUsernamePasswordProvider
+            requestPatterns:
+              'Networkteam.Neos.FrontendLogin:NeosFrontend':
+                pattern: Networkteam\Neos\FrontendLogin\Security\NeosRequestPattern
+                patternOptions:
+                  matchFrontend: true
+    mvc:
+      routes:
+        'Networkteam.Neos.FrontendLogin': true
+
+  Neos:
+    userInterface:
+      translation:
+        autoInclude:
+          Networkteam.Neos.FrontendLogin:
+            - 'NodeTypes/*'
+    fusion:
+      autoInclude:
+        'Networkteam.Neos.FrontendLogin': true
+    nodeTypes:
+      groups:
+        frontendLogin:
+          label: 'Frontend-Login'
+          icon: 'fas fa-user-lock'
+
+Networkteam:
+  Neos:
+    FrontendLogin:
+      translation:
+        packageKey: 'Networkteam.Neos.FrontendLogin'
+        sourceName: 'Main'
+      redirectOnLoginLogoutExceptionUri: '/'

@@ -1,0 +1,30 @@
+##
+# "LoginForm" element, extending "Plugin"
+#
+prototype(Networkteam.Neos.FrontendLogin:LoginForm) {
+    settings = ${Configuration.setting('Networkteam.Neos.FrontendLogin')}
+
+    redirectAfterLoginUri = Networkteam.Neos.Util:NodeUri {
+        node = ${q(node).property('redirectAfterLogin')}
+        disableAuthorizationChecks = true
+        @process.hmac = ${Networkteam.Neos.Util.Hash.appendHmac(value)}
+    }
+
+    redirectAfterLogoutUri = Networkteam.Neos.Util:NodeUri {
+        node = ${q(node).property('redirectAfterLogout')}
+        disableAuthorizationChecks = true
+        @process.hmac = ${Networkteam.Neos.Util.Hash.appendHmac(value)}
+    }
+
+    account = ${Security.account}
+
+    @cache {
+        mode = 'dynamic'
+        context {
+            1 = 'node'
+            2 = 'documentNode'
+            3 = 'site'
+        }
+        entryDiscriminator = ${request.httpRequest.methodSafe ? 'static' : false}
+    }
+}

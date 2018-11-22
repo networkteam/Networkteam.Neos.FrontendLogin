@@ -1,0 +1,28 @@
+privilegeTargets:
+
+  'Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
+    'Networkteam.Neos.FrontendLogin:LoginForm':
+      matcher: 'method(Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController->(?!initialize).*Action()) || method(Networkteam\Neos\FrontendLogin\Controller\AuthenticationController->(?!initialize).*Action())'
+
+  'Neos\ContentRepository\Security\Authorization\Privilege\Node\ReadNodePrivilege':
+    'Networkteam.Neos.FrontendLogin:MembersArea':
+      matcher: 'nodeIsOfType("Networkteam.Neos.FrontendLogin:Mixins.MembersArea")'
+
+roles:
+
+  'Neos.Flow:Everybody':
+    privileges:
+      -
+        # Grant any user access to the FrontendLoginLoginForm plugin
+        privilegeTarget: 'Networkteam.Neos.FrontendLogin:LoginForm'
+        permission: GRANT
+
+  'Neos.Neos:AbstractEditor':
+    privileges:
+    -
+      # Grant "backend users" access to the "Member area"
+      privilegeTarget: 'Networkteam.Neos.FrontendLogin:MembersArea'
+      permission: GRANT
+
+  'Networkteam.Neos.FrontendLogin:User':
+    privileges: []

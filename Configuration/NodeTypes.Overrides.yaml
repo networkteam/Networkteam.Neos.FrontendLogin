@@ -1,0 +1,5 @@
+'Neos.Neos:Document':
+  constraints:
+    nodeTypes:
+      'Networkteam.Neos.FrontendLogin:Mixins.MembersArea': false
+      'Networkteam.Neos.FrontendLogin:Mixins.MembersAreaRoot': true

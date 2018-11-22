@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+	<file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" target-language="de" datatype="plaintext">
+		<body>
+			<trans-unit id="ui.label" xml:space="preserve" approved="yes">
+				<source>Frontend login form</source>
+				<target state="translated">Frontend Login-Formular</target>
+			</trans-unit>
+			<trans-unit id="groups.pluginSettings" xml:space="preserve" approved="yes">
+				<source>Login Settings</source>
+				<target state="translated">Login Einstellungen</target>
+			</trans-unit>
+			<trans-unit id="properties.redirectAfterLogin" xml:space="preserve" approved="yes">
+				<source>Page after login</source>
+				<target state="translated">Seite nach dem Login</target>
+			</trans-unit>
+			<trans-unit id="properties.redirectAfterLogout" xml:space="preserve" approved="yes">
+				<source>Page after logout</source>
+				<target state="translated">Seite nach dem Logout</target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

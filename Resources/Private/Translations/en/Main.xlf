@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+	<file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" datatype="plaintext">
+		<body>
+			<trans-unit id="authentication.form.username" xml:space="preserve">
+				<source>Username</source>
+			</trans-unit>
+			<trans-unit id="authentication.form.password" xml:space="preserve">
+				<source>Password</source>
+			</trans-unit>
+			<trans-unit id="authentication.backendmessage" xml:space="preserve">
+				<source>The Frontend User Login Form is disabled in backend mode.</source>
+			</trans-unit>
+			<trans-unit id="authentication.form.submit" xml:space="preserve">
+				<source>Login</source>
+			</trans-unit>
+			<trans-unit id="authentication.failure.title" xml:space="preserve">
+				<source>Login failed!</source>
+			</trans-unit>
+			<trans-unit id="authentication.failure.message" xml:space="preserve">
+				<source>With the given credentials the login could not be performed successfully.</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

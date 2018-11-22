@@ -1,0 +1,18 @@
+'Networkteam.Neos.FrontendLogin:Mixins.MembersArea':
+  abstract: true
+  superTypes:
+    'Neos.NodeTypes:Page': true
+  constraints:
+    nodeTypes:
+      'Neos.Neos:Document': false
+      'Networkteam.Neos.FrontendLogin:Mixins.MembersArea': true
+      'Networkteam.Neos.FrontendLogin:Mixins.MembersAreaRoot': false
+  ui:
+    icon: 'fas fa-lock'
+    group: frontendLogin
+    inspector:
+      groups:
+        frontendLogin:
+          label: i18n
+          position: 'after document'
+          icon: 'fas fa-user-lock'
