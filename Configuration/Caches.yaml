@@ -1,0 +1,4 @@
+MemberAreaRootNodePathCache:
+  frontend: Neos\Cache\Frontend\VariableFrontend
+  backend: Neos\Cache\Backend\SimpleFileBackend
+  persistent: true
