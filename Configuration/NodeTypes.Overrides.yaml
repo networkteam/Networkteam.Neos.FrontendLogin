@@ -1,4 +1,4 @@
-'Neos.Neos:Document':
+'Neos.NodeTypes:Page':
   constraints:
     nodeTypes:
       'Networkteam.Neos.FrontendLogin:Mixins.MembersArea': false
