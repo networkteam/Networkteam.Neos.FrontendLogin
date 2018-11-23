@@ -5,16 +5,23 @@ namespace Networkteam\Neos\FrontendLogin\Aop;
  *  (c) 2018 networkteam GmbH - all rights reserved
  ***************************************************************/
 
+use Neos\Cache\Backend\SimpleFileBackend;
 use Neos\ContentRepository\Domain\Utility\NodePaths;
 use Neos\Error\Messages\Error;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\AOP\JoinPointInterface;
+use Networkteam\Neos\FrontendLogin\Service\MemberAreaRootNodePathCache;
 
 /**
  * @Flow\Aspect
  */
 class NodeAspect
 {
+    /**
+     * @Flow\Inject
+     * @var MemberAreaRootNodePathCache
+     */
+    protected $memberAreaRootNodePathCache;
 
     /**
      * @Flow\After("method(Neos\ContentRepository\TypeConverter\NodeConverter->convertFrom())")
@@ -30,6 +37,12 @@ class NodeAspect
             $source = $methodArguments['source'];
             $nodePathAndContext = NodePaths::explodeContextPath($source);
             $nodePath = $nodePathAndContext['nodePath'];
+
+            if ($this->memberAreaRootNodePathCache->has(MemberAreaRootNodePathCache::CACHE_IDENTIFIER)) {
+                $nodePathCache = $this->memberAreaRootNodePathCache->get(MemberAreaRootNodePathCache::CACHE_IDENTIFIER);
+            } else {
+
+            }
 
             /**
              * TODO: prüfen ob nodepath Teil von oder selber MemberAreaRoot ist
