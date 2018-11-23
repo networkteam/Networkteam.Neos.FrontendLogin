@@ -1,9 +1,0 @@
--
-  name: 'Frontend Login Form'
-  uriPattern: 'frontend-login(/{@action}).{@format}'
-  defaults:
-    '@package': 'Networkteam.Neos.FrontendLogin'
-    '@controller': 'Authentication'
-    '@format': 'html'
-    '@action': 'index'
-  appendExceedingArguments: true
