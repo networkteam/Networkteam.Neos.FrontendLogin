@@ -12,6 +12,7 @@ use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Model\Workspace;
+use Neos\Flow\Security\Context;
 use Neos\Neos\Domain\Service\ContentContext;
 
 class MemberAreaRootNodePathCache
@@ -75,13 +76,5 @@ class MemberAreaRootNodePathCache
             //TODO: warmup cache. get all nodes of type self::MEMBERAREAROOT_NODETYPE_NAME
         }
 
-        /** @var ContentContext $contentContext */
-        $contentContext = $this->contextFactory->create([
-            'workspaceName' => 'live',
-            'invisibleContentShown' => true,
-            'inaccessibleContentShown' => true
-        ]);
-
     }
-
 }
