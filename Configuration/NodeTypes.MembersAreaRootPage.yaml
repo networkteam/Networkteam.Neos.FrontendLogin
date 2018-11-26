@@ -1,5 +1,0 @@
-'Networkteam.Neos.FrontendLogin:MemberAreaRootPage':
-  superTypes:
-    'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot': true
-  ui:
-    label: Member Area Rootpage

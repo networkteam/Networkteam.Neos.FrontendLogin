@@ -1,1 +1,0 @@
-prototype(Networkteam.Neos.FrontendLogin:MemberAreaRootPage) < prototype(Networkteam.Neos.FrontendLogin:MemberAreaPage)

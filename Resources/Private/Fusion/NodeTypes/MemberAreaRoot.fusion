@@ -1,0 +1,1 @@
+prototype(Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot) < prototype(Networkteam.Neos.FrontendLogin:Mixins.MemberArea)

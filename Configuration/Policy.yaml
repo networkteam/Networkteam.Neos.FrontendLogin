@@ -25,4 +25,9 @@ roles:
       permission: GRANT
 
   'Networkteam.Neos.FrontendLogin:User':
-    privileges: []
+    privileges: [
+        -
+      # Grant "frontend users" access to the "Member area"
+      privilegeTarget: 'Networkteam.Neos.FrontendLogin:MemberArea'
+      permission: GRANT
+    ]

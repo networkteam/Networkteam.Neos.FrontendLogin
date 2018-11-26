@@ -1,0 +1,1 @@
+prototype(Networkteam.Neos.FrontendLogin:Mixins.MemberArea) < prototype(Neos.NodeTypes:Page)
