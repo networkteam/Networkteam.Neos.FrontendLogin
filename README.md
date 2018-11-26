@@ -90,7 +90,7 @@ Add additional member area pages beneath member area root page.
 To create a new Frontend User you can use the *neos.neos:user:create* command, e.g.
  
 ```bash
-./flow user:create --authentication-provider "Networkteam.Neos.FrontendLogin:Frontend" --roles "Networkteam.Neos.FrontendLoginUser"`
+./flow user:create --authentication-provider "Networkteam.Neos.FrontendLogin:Frontend" --roles "Networkteam.Neos.FrontendLogin:User"
 ```
 
 or use the user management module inside Neos backend.
