@@ -1,12 +1,12 @@
-'Networkteam.Neos.FrontendLogin:Mixins.MembersArea':
+'Networkteam.Neos.FrontendLogin:Mixins.MemberArea':
   abstract: true
   superTypes:
     'Neos.NodeTypes:Page': true
   constraints:
     nodeTypes:
       'Neos.Neos:Document': false
-      'Networkteam.Neos.FrontendLogin:Mixins.MembersArea': true
-      'Networkteam.Neos.FrontendLogin:Mixins.MembersAreaRoot': false
+      'Networkteam.Neos.FrontendLogin:Mixins.MemberArea': true
+      'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot': false
   ui:
     icon: 'fas fa-lock'
     group: frontendLogin

@@ -5,8 +5,8 @@ privilegeTargets:
       matcher: 'method(Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController->(?!initialize).*Action()) || method(Networkteam\Neos\FrontendLogin\Controller\AuthenticationController->(?!initialize).*Action())'
 
   'Neos\ContentRepository\Security\Authorization\Privilege\Node\ReadNodePrivilege':
-    'Networkteam.Neos.FrontendLogin:MembersArea':
-      matcher: 'nodeIsOfType("Networkteam.Neos.FrontendLogin:Mixins.MembersArea")'
+    'Networkteam.Neos.FrontendLogin:MemberArea':
+      matcher: 'nodeIsOfType("Networkteam.Neos.FrontendLogin:Mixins.MemberArea")'
 
 roles:
 
@@ -21,7 +21,7 @@ roles:
     privileges:
     -
       # Grant "backend users" access to the "Member area"
-      privilegeTarget: 'Networkteam.Neos.FrontendLogin:MembersArea'
+      privilegeTarget: 'Networkteam.Neos.FrontendLogin:MemberArea'
       permission: GRANT
 
   'Networkteam.Neos.FrontendLogin:User':

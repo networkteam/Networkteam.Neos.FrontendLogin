@@ -3,10 +3,13 @@
     <file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" datatype="plaintext">
         <body>
             <trans-unit id="ui.label" xml:space="preserve">
-                <source>Members area root page</source>
+                <source>Member area root page</source>
             </trans-unit>
             <trans-unit id="ui.help.message" xml:space="preserve">
-                <source>Members area root page help message</source>
+                <source>Member area root page help message</source>
+            </trans-unit>
+            <trans-unit id="properties.title" xml:space="preserve">
+                <source>Member area</source>
             </trans-unit>
             <trans-unit id="properties.loginFormPage" xml:space="preserve">
                 <source>Login form page</source>

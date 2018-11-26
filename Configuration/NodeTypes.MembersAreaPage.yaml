@@ -1,5 +1,5 @@
-'Networkteam.Neos.FrontendLogin:MembersAreaPage':
+'Networkteam.Neos.FrontendLogin:MemberAreaPage':
   superTypes:
-    'Networkteam.Neos.FrontendLogin:Mixins.MembersArea': true
+    'Networkteam.Neos.FrontendLogin:Mixins.MemberArea': true
   ui:
-    label: i18n
+    label: Member Area Page

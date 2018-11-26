@@ -5,13 +5,12 @@ namespace Networkteam\Neos\FrontendLogin\Aop;
  *  (c) 2018 networkteam GmbH - all rights reserved
  ***************************************************************/
 
-use Neos\Cache\Backend\SimpleFileBackend;
+use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\ContentRepository\Domain\Utility\NodePaths;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Error\Messages\Error;
-use Neos\Flow\Annotations as Flow;
 use Neos\Flow\AOP\JoinPointInterface;
 use Neos\Flow\Configuration\ConfigurationManager;
 use Neos\Flow\Http\Request;
@@ -21,18 +20,13 @@ use Neos\Flow\Mvc\Controller\Arguments;
 use Neos\Flow\Mvc\Controller\ControllerContext;
 use Neos\Flow\Mvc\Exception\StopActionException;
 use Neos\Flow\Mvc\Routing\UriBuilder;
-use Networkteam\Neos\FrontendLogin\Service\MemberAreaRootNodePathCache;
 
 /**
  * @Flow\Aspect
  */
 class NodeAspect
 {
-    /**
-     * @Flow\Inject
-     * @var MemberAreaRootNodePathCache
-     */
-    protected $memberAreaRootNodePathCache;
+    const MEMBERAREAROOT_NODETYPE_NAME = 'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot';
 
     /**
      * @Flow\Inject
@@ -58,56 +52,51 @@ class NodeAspect
     protected $uriBuilder;
 
     /**
+     * Try to find page with login form and redirect to it.
+     *
      * @Flow\After("method(Neos\ContentRepository\TypeConverter\NodeConverter->convertFrom())")
      * @param JoinPointInterface $joinPoint
      */
-    public function doSomething(JoinPointInterface $joinPoint)
+    public function redirectToLoginPage(JoinPointInterface $joinPoint)
     {
         $result = $joinPoint->getResult();
 
-        // Could not convert array to Node object because the node "%s" does not exist.
+        // requested node could not be found
         if ($result instanceof Error && $result->getCode() === 1370502328) {
             $methodArguments = $joinPoint->getMethodArguments();
             $source = $methodArguments['source'];
             $nodePathAndContext = NodePaths::explodeContextPath($source);
             $nodePath = $nodePathAndContext['nodePath'];
-
-//            if ($this->memberAreaRootNodePathCache->hasCache()) {
-//                $nodePathCache = $this->memberAreaRootNodePathCache->get();
-//            } else {
-//                $this->memberAreaRootNodePathCache->warmup($nodePath);
-//            }
-
-            /**
-             * TODO: prüfen ob nodepath Teil von oder selber MemberAreaRoot ist
-             * Wenn ja, dann finde MemberAreaRoot und nehme login node property und leite weiter zu login seite
-             */
-
-
-            //$nodePath von angefragem node ist vorahden
-
+            $memberAreaRootNode = null;
             $contentContext = $this->contextFactory->create([
                 'workspaceName' => 'live',
                 'invisibleContentShown' => false,
                 'inaccessibleContentShown' => true
             ]);
-            $memberAreaRootNode = null;
+
+            // try to find node by disabling authorization checks (CSRF token, policies, content security, ...)
             $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext, &$memberAreaRootNode) {
                 $requestedNode = $contentContext->getNode($nodePath);
                 $q = new FlowQuery([$requestedNode]);
                 /** @var NodeInterface $memberAreaRootNode */
-                $memberAreaRootNodes = $q->parents('[instanceof ' . MemberAreaRootNodePathCache::MEMBERAREAROOT_NODETYPE_NAME . ']');
+                $memberAreaRootNodes = $q->parents('[instanceof ' . self::MEMBERAREAROOT_NODETYPE_NAME . ']');
                 $memberAreaRootNode = $memberAreaRootNodes->get(0);
             });
 
             if ($memberAreaRootNode instanceof NodeInterface) {
-                $loginFormPage = $memberAreaRootNode->getProperty('loginFormPage');
-                $url = $this->getUrlToNode($loginFormPage);
+                try {
+                    $loginFormPage = $memberAreaRootNode->getProperty('loginFormPage');
 
-                // TODO: handle redirect corretly with status code etc.
-                header(sprintf('Location: %s', $url));
+                    if ($loginFormPage instanceof NodeInterface) {
+                        $url = $this->getUrlToNode($loginFormPage);
 
-                throw new StopActionException();
+                        // TODO: handle redirect corretly with status code etc.
+                        header(sprintf('Location: %s', $url));
+                        exit;
+                    }
+                } catch (\Exception $e) {
+
+                }
             }
         }
     }

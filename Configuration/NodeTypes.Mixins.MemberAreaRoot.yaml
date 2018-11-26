@@ -1,15 +1,12 @@
-'Networkteam.Neos.FrontendLogin:Mixins.MembersAreaRoot':
+'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot':
   abstract: true
   superTypes:
-    'Networkteam.Neos.FrontendLogin:Mixins.MembersArea': true
+    'Networkteam.Neos.FrontendLogin:Mixins.MemberArea': true
   ui:
     icon: 'fas fa-user-lock'
     help:
       message: i18n
   properties:
-    title:
-      defaultValue: 'Members area root'
-
     loginFormPage:
       type: reference
       ui:

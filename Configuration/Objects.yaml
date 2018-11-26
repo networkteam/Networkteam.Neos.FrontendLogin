@@ -1,9 +1,0 @@
-Networkteam\Neos\FrontendLogin\Service\MemberAreaRootNodePathCache:
-  properties:
-    cache:
-      object:
-        factoryObjectName: Neos\Flow\Cache\CacheManager
-        factoryMethodName: getCache
-        arguments:
-          1:
-            value: MemberAreaRootNodePathCache
