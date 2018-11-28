@@ -19,15 +19,14 @@ roles:
 
   'Neos.Neos:AbstractEditor':
     privileges:
-    -
-      # Grant "backend users" access to the "Member area"
-      privilegeTarget: 'Networkteam.Neos.FrontendLogin:MemberArea'
-      permission: GRANT
+      -
+        # Grant "backend users" access to the "Member area"
+        privilegeTarget: 'Networkteam.Neos.FrontendLogin:MemberArea'
+        permission: GRANT
 
   'Networkteam.Neos.FrontendLogin:User':
-    privileges: [
-        -
-      # Grant "frontend users" access to the "Member area"
-      privilegeTarget: 'Networkteam.Neos.FrontendLogin:MemberArea'
-      permission: GRANT
-    ]
+    privileges:
+      -
+        # Grant "frontend users" access to the "Member area"
+        privilegeTarget: 'Networkteam.Neos.FrontendLogin:MemberArea'
+        permission: GRANT
