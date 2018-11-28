@@ -1,11 +1,22 @@
 'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot':
   abstract: true
   superTypes:
-    'Networkteam.Neos.FrontendLogin:Mixins.MemberArea': true
+    'Neos.NodeTypes:Page': true
+  constraints:
+    nodeTypes:
+      'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot': false
   ui:
-    icon: 'fas fa-user-lock'
+    icon: 'fas fa-lock'
     help:
       message: i18n
+    group: frontendLogin
+    inspector:
+      groups:
+        frontendLogin:
+          label: i18n
+          position: 'after document'
+          icon: 'fas fa-user-lock'
+
   properties:
     loginFormPage:
       type: reference

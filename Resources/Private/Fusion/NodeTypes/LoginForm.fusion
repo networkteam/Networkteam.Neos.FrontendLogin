@@ -16,6 +16,8 @@ prototype(Networkteam.Neos.FrontendLogin:LoginForm) {
         @process.hmac = ${Networkteam.Neos.Util.Hash.appendHmac(value)}
     }
 
+    referer = ${request.arguments['referer'] ? request.arguments['referer'] : ''}
+
     account = ${Security.account}
 
     @cache {

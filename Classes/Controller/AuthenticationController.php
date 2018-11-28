@@ -46,7 +46,7 @@ class AuthenticationController extends AbstractAuthenticationController
     protected $hashService;
 
     /**
-     * return void
+     * @Flow\SkipCsrfProtection
      */
     public function logoutAction()
     {
@@ -70,9 +70,18 @@ class AuthenticationController extends AbstractAuthenticationController
     protected function onAuthenticationSuccess(ActionRequest $originalRequest = null)
     {
         try {
-            $redirectAfterLoginUri = $this->hashService->validateAndStripHmac(
-                $this->request->getArgument('redirectAfterLoginUri')
+            $referer = $this->hashService->validateAndStripHmac(
+                $this->request->getArgument('referer')
             );
+
+            if ($referer) {
+                $redirectAfterLoginUri = $referer;
+            } else {
+                $redirectAfterLoginUri = $this->hashService->validateAndStripHmac(
+                    $this->request->getArgument('redirectAfterLoginUri')
+                );
+            }
+
         } catch (\Exception $e) {
             $redirectAfterLoginUri = $this->redirectOnLoginLogoutExceptionUri;
         }

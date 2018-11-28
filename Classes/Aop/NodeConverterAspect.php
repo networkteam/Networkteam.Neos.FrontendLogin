@@ -20,11 +20,13 @@ use Neos\Flow\Mvc\Controller\Arguments;
 use Neos\Flow\Mvc\Controller\ControllerContext;
 use Neos\Flow\Mvc\Exception\StopActionException;
 use Neos\Flow\Mvc\Routing\UriBuilder;
+use Neos\Flow\Property\PropertyMappingConfigurationInterface;
+use Neos\Flow\Security\Cryptography\HashService;
 
 /**
  * @Flow\Aspect
  */
-class NodeAspect
+class NodeConverterAspect
 {
     const MEMBERAREAROOT_NODETYPE_NAME = 'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot';
 
@@ -52,78 +54,10 @@ class NodeAspect
     protected $uriBuilder;
 
     /**
-     * Try to find page with login form and redirect to it.
-     *
-     * @Flow\After("method(Neos\ContentRepository\TypeConverter\NodeConverter->convertFrom())")
-     * @param JoinPointInterface $joinPoint
+     * @var HashService
+     * @Flow\Inject
      */
-    public function redirectToLoginPage(JoinPointInterface $joinPoint)
-    {
-        $result = $joinPoint->getResult();
-
-        // requested node could not be found
-        if ($result instanceof Error && $result->getCode() === 1370502328) {
-            $methodArguments = $joinPoint->getMethodArguments();
-            $source = $methodArguments['source'];
-            $nodePathAndContext = NodePaths::explodeContextPath($source);
-            $nodePath = $nodePathAndContext['nodePath'];
-            $memberAreaRootNode = null;
-            $contentContext = $this->contextFactory->create([
-                'workspaceName' => 'live',
-                'invisibleContentShown' => false,
-                'inaccessibleContentShown' => true
-            ]);
-
-            // try to find node by disabling authorization checks (CSRF token, policies, content security, ...)
-            $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext, &$memberAreaRootNode) {
-                $requestedNode = $contentContext->getNode($nodePath);
-                $q = new FlowQuery([$requestedNode]);
-                /** @var NodeInterface $memberAreaRootNode */
-                $memberAreaRootNodes = $q->parents('[instanceof ' . self::MEMBERAREAROOT_NODETYPE_NAME . ']');
-                $memberAreaRootNode = $memberAreaRootNodes->get(0);
-            });
-
-            if ($memberAreaRootNode instanceof NodeInterface) {
-                try {
-                    $loginFormPage = $memberAreaRootNode->getProperty('loginFormPage');
-
-                    if ($loginFormPage instanceof NodeInterface) {
-                        $url = $this->getUrlToNode($loginFormPage);
-
-                        // TODO: handle redirect corretly with status code etc.
-                        header(sprintf('Location: %s', $url));
-                        exit;
-                    }
-                } catch (\Exception $e) {
-
-                }
-            }
-        }
-    }
-
-    /**
-     * Create the frontend URL to a node
-     *
-     * @param NodeInterface $node
-     * @return string The URL of the node
-     * @throws \Neos\Neos\Exception
-     */
-    protected function getUrlToNode(NodeInterface $node)
-    {
-        $uri = $this->linkingService->createNodeUri(
-            new ControllerContext(
-                $this->uriBuilder->getRequest(),
-                new Response(),
-                new Arguments([]),
-                $this->uriBuilder
-            ),
-            $node,
-            $node->getContext()->getRootNode(),
-            'html',
-            true
-        );
-        return $uri;
-    }
+    protected $hashService;
 
     /**
      * The injection of the faked UriBuilder is necessary to generate frontend URLs from the backend
@@ -139,5 +73,109 @@ class NodeAspect
         $uriBuilder->setRequest($request);
         $uriBuilder->setCreateAbsoluteUri(true);
         $this->uriBuilder = $uriBuilder;
+    }
+
+    /**
+     * Try to find page with login form and redirect to it.
+     *
+     * @Flow\After("method(Neos\ContentRepository\TypeConverter\NodeConverter->convertFrom())")
+     * @param JoinPointInterface $joinPoint
+     */
+    public function redirectToLoginPage(JoinPointInterface $joinPoint)
+    {
+        $result = $joinPoint->getResult();
+
+        // requested node could not be found
+        if ($result instanceof Error && $result->getCode() === 1370502328) {
+            $methodArguments = $joinPoint->getMethodArguments();
+            $source = $methodArguments['source'];
+
+            if (is_array($source)) {
+                $source = $source['__contextNodePath'];
+            }
+
+            $nodePathAndContext = NodePaths::explodeContextPath($source);
+            $nodePath = $nodePathAndContext['nodePath'];
+            $workspaceName = $nodePathAndContext['workspaceName'];
+            $dimensions = $nodePathAndContext['dimensions'];
+            $contentContext = $this->contextFactory->create($this->prepareContextProperties($workspaceName, $dimensions));
+            $memberAreaRootNode = null;
+            $requestedNode = null;
+
+            // try to find node by disabling authorization checks (CSRF token, policies, content security, ...)
+            $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext, &$memberAreaRootNode, &$requestedNode) {
+                try {
+                    $requestedNode = $contentContext->getNode($nodePath);
+                } catch (\Exception $e) {
+
+                }
+
+                if ($requestedNode->getNodeType()->isOfType(self::MEMBERAREAROOT_NODETYPE_NAME)) {
+                    $memberAreaRootNode = $requestedNode;
+                } else {
+                    $q = new FlowQuery([$requestedNode]);
+                    $memberAreaRootNode = $q->parents('[instanceof ' . self::MEMBERAREAROOT_NODETYPE_NAME . ']')->get(0);
+                }
+            });
+
+            if ($memberAreaRootNode instanceof NodeInterface) {
+                try {
+                    $loginFormPage = $memberAreaRootNode->getProperty('loginFormPage');
+                    if ($loginFormPage instanceof NodeInterface) {
+                        $arguments = [];
+                        if ($requestedNode instanceof NodeInterface) {
+                            $requestedNodeUri = $this->getUrlToNode($requestedNode);
+                            $referer = $this->hashService->appendHmac($requestedNodeUri);
+                            $arguments['referer'] = $referer;
+                        }
+                        $url = $this->getUrlToNode($loginFormPage, $arguments);
+
+                        // TODO: handle redirect correctly with status code etc.
+                        header(sprintf('Location: %s', $url));
+                        exit;
+                    }
+                } catch (\Exception $e) {
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Create the frontend URL to a node
+     *
+     * @throws \Neos\Neos\Exception
+     */
+    protected function getUrlToNode(NodeInterface $node, array $arguments = []): string
+    {
+        $uri = $this->linkingService->createNodeUri(
+            new ControllerContext(
+                $this->uriBuilder->getRequest(),
+                new Response(),
+                new Arguments([]),
+                $this->uriBuilder
+            ),
+            $node,
+            $node->getContext()->getRootNode(),
+            'html',
+            true,
+            $arguments
+        );
+        return $uri;
+    }
+
+    protected function prepareContextProperties($workspaceName, array $dimensions = null): array
+    {
+        $contextProperties = array(
+            'workspaceName' => $workspaceName,
+            'invisibleContentShown' => false,
+            'inaccessibleContentShown' => true
+        );
+
+        if ($dimensions !== null) {
+            $contextProperties['dimensions'] = $dimensions;
+        }
+
+        return $contextProperties;
     }
 }

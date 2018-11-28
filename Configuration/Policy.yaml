@@ -4,11 +4,10 @@ privilegeTargets:
     'Networkteam.Neos.FrontendLogin:LoginForm':
       matcher: 'method(Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController->(?!initialize).*Action()) || method(Networkteam\Neos\FrontendLogin\Controller\AuthenticationController->(?!initialize).*Action())'
 
-  'Neos\ContentRepository\Security\Authorization\Privilege\Node\ReadNodePrivilege':
-    'Networkteam.Neos.FrontendLogin:MemberArea':
-      matcher: 'nodeIsOfType("Networkteam.Neos.FrontendLogin:Mixins.MemberArea")'
-
 roles:
+
+  'Networkteam.Neos.FrontendLogin:FrontendUser':
+    parentRoles: []
 
   'Neos.Flow:Everybody':
     privileges:
@@ -18,15 +17,4 @@ roles:
         permission: GRANT
 
   'Neos.Neos:AbstractEditor':
-    privileges:
-      -
-        # Grant "backend users" access to the "Member area"
-        privilegeTarget: 'Networkteam.Neos.FrontendLogin:MemberArea'
-        permission: GRANT
-
-  'Networkteam.Neos.FrontendLogin:User':
-    privileges:
-      -
-        # Grant "frontend users" access to the "Member area"
-        privilegeTarget: 'Networkteam.Neos.FrontendLogin:MemberArea'
-        permission: GRANT
+    parentRoles: ['Networkteam.Neos.FrontendLogin:FrontendUser']
