@@ -70,18 +70,9 @@ class AuthenticationController extends AbstractAuthenticationController
     protected function onAuthenticationSuccess(ActionRequest $originalRequest = null)
     {
         try {
-            $referer = $this->hashService->validateAndStripHmac(
-                $this->request->getArgument('referer')
+            $redirectAfterLoginUri = $this->hashService->validateAndStripHmac(
+                $this->request->getArgument('redirectAfterLoginUri')
             );
-
-            if ($referer) {
-                $redirectAfterLoginUri = $referer;
-            } else {
-                $redirectAfterLoginUri = $this->hashService->validateAndStripHmac(
-                    $this->request->getArgument('redirectAfterLoginUri')
-                );
-            }
-
         } catch (\Exception $e) {
             $redirectAfterLoginUri = $this->redirectOnLoginLogoutExceptionUri;
         }
