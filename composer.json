@@ -5,6 +5,12 @@
     "license": [
         "GPL-3.0-or-later"
     ],
+    "authors": [
+        {
+            "name": "Kai Möller",
+            "email": "kai.moeller@networkteam.com"
+        }
+    ],
     "require": {
         "neos/flow": "*",
         "neos/neos": "~4.0"
