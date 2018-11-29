@@ -6,8 +6,17 @@ privilegeTargets:
 
 roles:
 
+  'Networkteam.Neos.FrontendLogin:MemberArea':
+    abstract: true
+
   'Networkteam.Neos.FrontendLogin:FrontendUser':
-    parentRoles: []
+    parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
+
+  'Networkteam.Neos.FrontendLogin:MemberOfA':
+    parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
+
+  'Networkteam.Neos.FrontendLogin:MemberOfB':
+    parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
 
   'Neos.Flow:Everybody':
     privileges:
