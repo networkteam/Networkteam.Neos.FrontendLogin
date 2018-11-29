@@ -1,7 +1,10 @@
 {
     "name": "networkteam/neos-frontendlogin",
-    "description": "",
     "type": "neos-package",
+    "description": "A Neos package building up member area with frontend login",
+    "license": [
+        "GPL-3.0-or-later"
+    ],
     "require": {
         "neos/flow": "*",
         "neos/neos": "~4.0"
