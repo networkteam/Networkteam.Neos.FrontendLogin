@@ -23,6 +23,8 @@ class NodeAccessService
     {
         if ($this->isMemberAreaNode($node)) {
             $this->addFrontendUserAccessRole($node);
+        } else {
+            $this->removeFrontendUserAccessRole($node);
         }
     }
 
@@ -45,10 +47,24 @@ class NodeAccessService
 
     protected function addFrontendUserAccessRole(NodeInterface $node): void
     {
-        // Die Prüfung of die Rolle bereits vorhanden is wird innerhalb von \Neos\ContentRepository\Domain\Model\Node::setAccessRoles erledigt
+        // We do not need to check for existance of frontend user role to prevent a nodeUpdate signal.
+        // This is done within \Neos\ContentRepository\Domain\Model\Node::setAccessRoles
         $accessRoles = $node->getAccessRoles();
         $accessRoles[] = self::FRONTEND_USER_ROLE_NAME;
-        $node->setAccessRoles($accessRoles);
+        $node->setAccessRoles(array_unique($accessRoles));
     }
 
+    protected function removeFrontendUserAccessRole(NodeInterface $node): void
+    {
+        $accessRoles = $node->getAccessRoles();
+        $keysToRemove = array_keys($accessRoles, self::FRONTEND_USER_ROLE_NAME);
+
+        if ($keysToRemove) {
+            foreach ($keysToRemove as $key) {
+                unset($accessRoles[$key]);
+            }
+
+            $node->setAccessRoles($accessRoles);
+        }
+    }
 }

@@ -110,11 +110,13 @@ class NodeConverterAspect
 
                 }
 
-                if ($requestedNode->getNodeType()->isOfType(self::MEMBERAREAROOT_NODETYPE_NAME)) {
-                    $memberAreaRootNode = $requestedNode;
-                } else {
-                    $q = new FlowQuery([$requestedNode]);
-                    $memberAreaRootNode = $q->parents('[instanceof ' . self::MEMBERAREAROOT_NODETYPE_NAME . ']')->get(0);
+                if ($requestedNode instanceof NodeInterface) {
+                    if ($requestedNode->getNodeType()->isOfType(self::MEMBERAREAROOT_NODETYPE_NAME)) {
+                        $memberAreaRootNode = $requestedNode;
+                    } else {
+                        $q = new FlowQuery([$requestedNode]);
+                        $memberAreaRootNode = $q->parents('[instanceof ' . self::MEMBERAREAROOT_NODETYPE_NAME . ']')->get(0);
+                    }
                 }
             });
 

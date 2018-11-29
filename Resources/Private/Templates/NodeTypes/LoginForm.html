@@ -31,14 +31,7 @@
 									<f:form.submit value="{f:translate(package:settings.translation.packageKey, id:'authentication.form.submit', source: settings.translation.sourceName)}" class="btn btn-primary" />
 								</div>
 							</div>
-                            <f:if condition="{referer}">
-                                <f:then>
-                                    <f:form.hidden name="redirectAfterLoginUri" value="{referer}" />
-                                </f:then>
-                                <f:else>
-                                    <f:form.hidden name="redirectAfterLoginUri" value="{redirectAfterLoginUri}" />
-                                </f:else>
-                            </f:if>
+							<f:form.hidden name="redirectAfterLoginUri" value="{redirectAfterLoginUri}" />
 						</f:form>
 					</f:else>
 				</f:security.ifHasRole>

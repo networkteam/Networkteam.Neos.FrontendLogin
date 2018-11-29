@@ -4,19 +4,25 @@
 prototype(Networkteam.Neos.FrontendLogin:LoginForm) {
     settings = ${Configuration.setting('Networkteam.Neos.FrontendLogin')}
 
-    redirectAfterLoginUri = Networkteam.Neos.Util:NodeUri {
-        node = ${q(node).property('redirectAfterLogin')}
-        disableAuthorizationChecks = true
+    redirectAfterLoginUri = Neos.Fusion:Case {
+        refererIsSetAndValid {
+            condition = ${request.httpRequest.arguments['referer'] && Networkteam.Neos.Util.Hash.validate(request.httpRequest.arguments['referer'])}
+            renderer = ${request.httpRequest.arguments['referer']}
+        }
+        default {
+            condition = ${true}
+            renderer = Neos.Neos:NodeUri {
+                node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogin')}
+                @process.hmac = ${Networkteam.Neos.Util.Hash.appendHmac(value)}
+            }
+        }
+    }
+
+    redirectAfterLogoutUri = Neos.Neos:NodeUri {
+        node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogout')}
         @process.hmac = ${Networkteam.Neos.Util.Hash.appendHmac(value)}
     }
 
-    redirectAfterLogoutUri = Networkteam.Neos.Util:NodeUri {
-        node = ${q(node).property('redirectAfterLogout')}
-        disableAuthorizationChecks = true
-        @process.hmac = ${Networkteam.Neos.Util.Hash.appendHmac(value)}
-    }
-
-    referer = ${request.arguments['referer'] ? request.arguments['referer'] : ''}
 
     account = ${Security.account}
 
@@ -29,4 +35,9 @@ prototype(Networkteam.Neos.FrontendLogin:LoginForm) {
         }
         entryDiscriminator = ${request.httpRequest.methodSafe ? 'static' : false}
     }
+}
+
+# caching configuration
+prototype(Neos.Fusion:GlobalCacheIdentifiers) {
+    refererArgument = ${request.httpRequest.arguments.referer}
 }
