@@ -1,12 +1,13 @@
 # Networkteam.Neos.FrontendLogin
 
 Neos package for frontend login inspired by  [Flowpack.Neos.FrontendLogin](https://github.com/Flowpack/Flowpack.Neos.FrontendLogin).
-It provides mixins for member area pages and member area root pages 
-
+It provides a mixin for member area root pages. The packages makes use of the `accessRoles` property of `NodeInterface`.
 
 ## Features
 
-* Redirect to login form when a protected uri is requested
+* Place a member area page within your page tree and all pages beneath it including the member area page itself will be protected
+* Redirect to configured login form when a protected uri is requested
+* Configure redirect page after login and logout or redirect to requested protected page (referer) after login
 
 ## Installation
 
@@ -44,7 +45,7 @@ An example configuration could look as follows:
     label: 'Member area'
 ```
 
-### Define fusion objects
+### Define fusion object
 
 For your defined nodeType you need a suitable fusion object. An example configuration could look as follows:
 
@@ -59,8 +60,8 @@ prototype(Your.Package:MemberAreaRootPage) < prototype(Networkteam.Neos.Frontend
 ### Add pages and login form
 
 Now you can log into Neos backend and create a new member area root page.
-Next you need to add a login form content node on a page which is **not of type** `Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot`.
-Add additional pages beneath your member area root page.
+Next you need to add a login form on a page which is **not of type** `Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot`.
+Additionally you can add further pages beneath your member area root page. They will be protected.
 
 ## Create Frontend Users
 

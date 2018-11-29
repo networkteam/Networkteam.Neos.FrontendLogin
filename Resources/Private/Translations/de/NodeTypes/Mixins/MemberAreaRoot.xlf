@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" datatype="plaintext">
+    <file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" target-language="de" datatype="plaintext">
         <body>
             <trans-unit id="groups.frontendLogin" xml:space="preserve">
                 <source>Member area</source>
+                <target state="translated">Mitgliederbereich</target>
             </trans-unit>
             <trans-unit id="ui.label" xml:space="preserve">
                 <source>Member area root page</source>
+                <target state="translated">Startseite des Mitgliederbereichs</target>
             </trans-unit>
             <trans-unit id="ui.help.message" xml:space="preserve">
                 <source>All DocumentNodes beneath member area root page and the member area root page itself are protected and not accessable for website users. Only logged in frontend users having **Networkteam.Neos.FrontendLogin:FrontendUser** role are able to see these nodes.</source>
+                <target>Alle DocumentNodes unterhalb des Mitgliederbereichs inklive der Mitgliederbereichsseite selbst sind geschützt und für Webseiten-Benutzer nicht zugänglich. Nur angemeldete Frontend-Benutzer mit der Rolle **Networkteam.Neos.FrontendLogin:FrontendUser** sind in der Lage, diese Nodes zu sehen.</target>
             </trans-unit>
             <trans-unit id="properties.title" xml:space="preserve">
                 <source>Member area</source>

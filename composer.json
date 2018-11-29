@@ -4,8 +4,7 @@
     "type": "neos-package",
     "require": {
         "neos/flow": "*",
-        "neos/neos": "~4.0",
-        "networkteam/neos-util": "*"
+        "neos/neos": "~4.0"
     },
     "autoload": {
         "psr-4": {

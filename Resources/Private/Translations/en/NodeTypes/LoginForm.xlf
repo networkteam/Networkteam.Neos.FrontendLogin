@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-	<file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" datatype="plaintext">
-		<body>
-			<trans-unit id="ui.label" xml:space="preserve">
-				<source>(nwt) Frontend login form</source>
-			</trans-unit>
-			<trans-unit id="groups.loginActions" xml:space="preserve">
-				<source>(nwt) Login Settings</source>
-			</trans-unit>
-			<trans-unit id="properties.redirectAfterLogin" xml:space="preserve">
-				<source>(nwt) Page after login</source>
-			</trans-unit>
-			<trans-unit id="properties.redirectAfterLogout" xml:space="preserve">
-				<source>(nwt) Page after logout</source>
-			</trans-unit>
-		</body>
-	</file>
+    <file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" datatype="plaintext">
+        <body>
+            <trans-unit id="ui.label" xml:space="preserve">
+                <source>Frontend login form</source>
+            </trans-unit>
+            <trans-unit id="groups.actions" xml:space="preserve">
+                <source>Actions</source>
+            </trans-unit>
+            <trans-unit id="properties.redirectAfterLogin" xml:space="preserve">
+                <source>Page after login</source>
+            </trans-unit>
+            <trans-unit id="properties.redirectAfterLogin.ui.help.message" xml:space="preserve">
+                <source>You can choose from any DocumentNode within the page tree, especially those within member area.</source>
+            </trans-unit>
+            <trans-unit id="properties.redirectAfterLogout" xml:space="preserve">
+                <source>Page after logout</source>
+            </trans-unit>
+            <trans-unit id="properties.redirectAfterLogout.ui.help.message" xml:space="preserve">
+                <source>Choose a DocumentNode outside of member area.</source>
+            </trans-unit>
+        </body>
+    </file>
 </xliff>

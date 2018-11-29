@@ -6,21 +6,21 @@ prototype(Networkteam.Neos.FrontendLogin:LoginForm) {
 
     redirectAfterLoginUri = Neos.Fusion:Case {
         refererIsSetAndValid {
-            condition = ${request.httpRequest.arguments['referer'] && Networkteam.Neos.Util.Hash.validate(request.httpRequest.arguments['referer'])}
+            condition = ${request.httpRequest.arguments['referer'] && Networkteam.Neos.FrontendLogin.Hash.validate(request.httpRequest.arguments['referer'])}
             renderer = ${request.httpRequest.arguments['referer']}
         }
         default {
             condition = ${true}
             renderer = Neos.Neos:NodeUri {
                 node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogin')}
-                @process.hmac = ${Networkteam.Neos.Util.Hash.appendHmac(value)}
+                @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
             }
         }
     }
 
     redirectAfterLogoutUri = Neos.Neos:NodeUri {
         node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogout')}
-        @process.hmac = ${Networkteam.Neos.Util.Hash.appendHmac(value)}
+        @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
     }
 
 

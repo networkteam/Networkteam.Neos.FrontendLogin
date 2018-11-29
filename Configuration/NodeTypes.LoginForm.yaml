@@ -9,18 +9,21 @@
     icon: 'icon-key'
     inspector:
       groups:
-        loginActions:
+        actions:
           label: i18n
           icon: 'icon-link'
+
 
   properties:
     redirectAfterLogin:
       type: reference
       ui:
         label: i18n
+        help:
+          message: i18n
         reloadIfChanged: false
         inspector:
-          group: 'loginActions'
+          group: 'actions'
           editorOptions:
             nodeTypes:
               - 'Neos.Neos:Document'
@@ -28,9 +31,11 @@
       type: reference
       ui:
         label: i18n
+        help:
+          message: i18n
         reloadIfChanged: false
         inspector:
-          group: 'loginActions'
+          group: 'actions'
           editorOptions:
             nodeTypes:
               - 'Neos.Neos:Document'

@@ -33,6 +33,10 @@ Neos:
           label: 'Frontend-Login'
           icon: 'fas fa-user-lock'
 
+  Fusion:
+    defaultContext:
+      Networkteam.Neos.FrontendLogin.Hash: \Networkteam\Neos\FrontendLogin\Eel\HashHelper
+
 Networkteam:
   Neos:
     FrontendLogin:
