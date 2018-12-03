@@ -10,6 +10,8 @@ use Neos\ContentRepository\Domain\Model\Node;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Security\Policy\PolicyService;
+use Networkteam\Neos\FrontendLogin\DataSource\RoleDataSource;
 
 /**
  * @Flow\Scope("singleton")
@@ -22,25 +24,33 @@ class NodeAccessService
 
     protected $processedNodes = [];
 
+    /**
+     * @Flow\Inject
+     * @var RoleService
+     */
+    protected $roleService;
+
     public function updateAccessRoles(NodeInterface $node)
     {
-        if ($node->getNodeType()->isOfType('Neos.Neos:Document') === false) {
-            return;
-        }
+        $isDocumentNode = $node->getNodeType()->isOfType('Neos.Neos:Document');
+        $isProcessedNode = in_array($node->getIdentifier(), $this->processedNodes);
 
-        if (in_array($node->getIdentifier(), $this->processedNodes)) {
+        if (!$isDocumentNode || $isProcessedNode) {
             return;
         }
 
         $memberAreaRootNode = $this->getMemberAreaRootNodeFromDocumentNode($node);
 
-        if ($memberAreaRootNode instanceof NodeInterface) {
-            $this->addFrontendUserAccessRole($node, $memberAreaRootNode);
-        } else {
-            $this->removeAllMemberAreaRoles($node);
-        }
+        // do not handle member area root nodes
+        if ($memberAreaRootNode !== $node) {
+            if ($memberAreaRootNode instanceof NodeInterface) {
+                $this->addMemberAreaAccessRoles($node, $memberAreaRootNode);
+            } else {
+                $this->removeAllMemberAreaRoles($node);
+            }
 
-        $this->processedNodes[] = $node->getIdentifier();
+            $this->processedNodes[] = $node->getIdentifier();
+        }
     }
 
     protected function getMemberAreaRootNodeFromDocumentNode(NodeInterface $node): ?NodeInterface
@@ -56,26 +66,13 @@ class NodeAccessService
         return $memberAreaRootNodes->get(0);
     }
 
-    protected function addFrontendUserAccessRole(NodeInterface $node, NodeInterface $memberAreaRootNode): void
+    protected function addMemberAreaAccessRoles(NodeInterface $node, NodeInterface $memberAreaRootNode): void
     {
-        $accessRoles = $node->getAccessRoles();
-
         // before adding roles we need to remove all other member area nodes
-        $roles = $this->getRolesFromAllMemberAreas($node);
-        $keysToRemove = array_keys($accessRoles, $roles);
-        if ($keysToRemove) {
-            foreach ($keysToRemove as $key) {
-                unset($accessRoles[$key]);
-            }
-        }
+        $accessRoles = $this->roleService->getAccessRolesForNodeWithoutMemberAreaRoles($node);
 
-        $memberAreaRoles = $memberAreaRootNode->getProperty('roles');
-        if (empty($memberAreaRoles)) {
-            $memberAreaRoles = [self::DEFAULT_MEMBERAREA_ROLE_NAME];
-        }
-
-        if ($memberAreaRoles) {
-            foreach ($memberAreaRoles as $roleIdentifier) {
+        if (is_array($accessRoles)) {
+            foreach ($memberAreaRootNode->getAccessRoles() as $roleIdentifier) {
                 $accessRoles[] = $roleIdentifier;
             }
 
@@ -85,35 +82,16 @@ class NodeAccessService
         }
     }
 
-    protected function removeAllMemberAreaRoles(NodeInterface $node): void
+    protected function removeAllMemberAreaRoles(NodeInterface $node): bool
     {
-        $roles = $this->getRolesFromAllMemberAreas($node);
+        $accessRoles = $this->roleService->getAccessRolesForNodeWithoutMemberAreaRoles($node);
 
-        $accessRoles = $node->getAccessRoles();
-        $keysToRemove = array_keys($accessRoles, $roles);
-        if ($keysToRemove) {
-            foreach ($keysToRemove as $key) {
-                unset($accessRoles[$key]);
-            }
-
-            $node->setAccessRoles($accessRoles);
+        if (is_array($accessRoles)) {
+            $node->setAccessRoles(array_unique($accessRoles));
+            return true;
+        } else {
+            return false;
         }
     }
 
-    protected function getRolesFromAllMemberAreas(NodeInterface $node): array
-    {
-        $q = new FlowQuery([$node->getContext()->getRootNode()]);
-        /** @var NodeInterface $memberAreaRootNode */
-        $memberAreaRootNodes = $q->find('[instanceof ' . self::MEMBERAREAROOT_NODETYPE_NAME . ']');
-
-        $roles = [];
-        foreach ($memberAreaRootNodes as $memberAreaRootNode) {
-            $memberAreaRoles = $memberAreaRootNode->getProperty('roles');
-            if (is_array($memberAreaRoles)) {
-                $roles = array_merge($roles, $memberAreaRoles);
-            }
-        }
-
-        return array_unique($roles);
-    }
 }

@@ -6,13 +6,11 @@ namespace Networkteam\Neos\FrontendLogin\DataSource;
  ***************************************************************/
 
 use Neos\ContentRepository\Domain\Model\NodeInterface;
-use Neos\Flow\Security\Policy\PolicyService;
+use Neos\Flow\Security\Policy\Role;
 use Neos\Flow\Annotations as Flow;
 
 class RoleDataSource extends \Neos\Neos\Service\DataSource\AbstractDataSource
 {
-
-    const MEMBER_AREA_ROLE_NAME = 'Networkteam.Neos.FrontendLogin:MemberArea';
 
     /**
      * @var string
@@ -21,9 +19,9 @@ class RoleDataSource extends \Neos\Neos\Service\DataSource\AbstractDataSource
 
     /**
      * @Flow\Inject
-     * @var PolicyService
+     * @var \Networkteam\Neos\FrontendLogin\Service\RoleService
      */
-    protected $policyService;
+    protected $roleService;
 
     /**
      * Get data
@@ -36,19 +34,40 @@ class RoleDataSource extends \Neos\Neos\Service\DataSource\AbstractDataSource
      */
     public function getData(NodeInterface $node = null, array $arguments)
     {
+        $memberAreaRoles = $this->roleService->getMemberAreaRoles();
         $roles = [];
-        $memberAreaRole = $this->policyService->getRole(self::MEMBER_AREA_ROLE_NAME);
 
-        foreach ($this->policyService->getRoles() as $role) {
-            if ($role->hasParentRole($memberAreaRole)) {
-                $roles[$role->getIdentifier()] = [
-                    'label' => $role->getName(),
-                    'group' => $role->getPackageKey(),
-                    'icon' => 'fas fa-user-tag'
-                ];
-            }
+        foreach ($memberAreaRoles as $role) {
+            $roles[$role->getIdentifier()] = [
+                'label' => $role->getName(),
+                'group' => $role->getPackageKey(),
+                'icon' => 'fas fa-user-tag'
+            ];
         }
 
+        // Sort roles by group first and than by label.
+        // @see https://neos.readthedocs.io/en/stable/References/PropertyEditorReference.html?highlight=SelectBoxEditor
+        uasort($roles, ['self', 'sortRolesByPackageKey']);
+        uasort($roles, ['self', 'sortRolesByLabel']);
+
         return $roles;
+    }
+
+    static protected function sortRolesByPackageKey(array $a, array $b): int
+    {
+        if ($a['group'] == $b['group']) {
+            return 0;
+        }
+
+        return $a['group'] < $b['group'] ? -1 : 1;
+    }
+
+    static protected function sortRolesByLabel(array $a, array $b): int
+    {
+        if ($a['label'] == $b['label']) {
+            return 0;
+        }
+
+        return $a['label'] < $b['label'] ? -1 : 1;
     }
 }

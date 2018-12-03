@@ -6,24 +6,20 @@ privilegeTargets:
 
 roles:
 
+  'Neos.Flow:Everybody':
+    privileges:
+    -
+      # Grant any user access to the FrontendLoginLoginForm plugin
+      privilegeTarget: 'Networkteam.Neos.FrontendLogin:LoginForm'
+      permission: GRANT
+
   'Networkteam.Neos.FrontendLogin:MemberArea':
     abstract: true
 
   'Networkteam.Neos.FrontendLogin:FrontendUser':
     parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
 
-  'Networkteam.Neos.FrontendLogin:MemberOfA':
-    parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
-
-  'Networkteam.Neos.FrontendLogin:MemberOfB':
-    parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
-
-  'Neos.Flow:Everybody':
-    privileges:
-      -
-        # Grant any user access to the FrontendLoginLoginForm plugin
-        privilegeTarget: 'Networkteam.Neos.FrontendLogin:LoginForm'
-        permission: GRANT
-
   'Neos.Neos:AbstractEditor':
-    parentRoles: ['Networkteam.Neos.FrontendLogin:FrontendUser']
+    # If you introduce new roles of type 'Networkteam.Neos.FrontendLogin:MemberArea' make sure adding them to parentRoles of 'Neos.Neos:AbstractEditor'
+    parentRoles:
+      - 'Networkteam.Neos.FrontendLogin:FrontendUser'
