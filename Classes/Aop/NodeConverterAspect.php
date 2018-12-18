@@ -18,18 +18,15 @@ use Neos\Flow\Http\Response;
 use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\Mvc\Controller\Arguments;
 use Neos\Flow\Mvc\Controller\ControllerContext;
-use Neos\Flow\Mvc\Exception\StopActionException;
 use Neos\Flow\Mvc\Routing\UriBuilder;
-use Neos\Flow\Property\PropertyMappingConfigurationInterface;
 use Neos\Flow\Security\Cryptography\HashService;
+use Networkteam\Neos\FrontendLogin\Service\NodeAccessService;
 
 /**
  * @Flow\Aspect
  */
 class NodeConverterAspect
 {
-    const MEMBERAREAROOT_NODETYPE_NAME = 'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot';
-
     /**
      * @Flow\Inject
      * @var ContextFactoryInterface
@@ -111,11 +108,11 @@ class NodeConverterAspect
                 }
 
                 if ($requestedNode instanceof NodeInterface) {
-                    if ($requestedNode->getNodeType()->isOfType(self::MEMBERAREAROOT_NODETYPE_NAME)) {
+                    if ($requestedNode->getNodeType()->isOfType(NodeAccessService::MEMBERAREAROOT_NODETYPE_NAME)) {
                         $memberAreaRootNode = $requestedNode;
                     } else {
                         $q = new FlowQuery([$requestedNode]);
-                        $memberAreaRootNode = $q->parents('[instanceof ' . self::MEMBERAREAROOT_NODETYPE_NAME . ']')->get(0);
+                        $memberAreaRootNode = $q->parents('[instanceof ' . NodeAccessService::MEMBERAREAROOT_NODETYPE_NAME . ']')->get(0);
                     }
                 }
             });

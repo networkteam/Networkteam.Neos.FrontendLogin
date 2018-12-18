@@ -72,3 +72,9 @@ To create a new Frontend User you can use the *neos.neos:user:create* command, e
 ```
 
 or use the user management module inside Neos backend.
+
+## Adding your own MemberArea roles
+
+If you define your own MemberArea roles via `Policy.yaml` make sure you add them as `parentRoles` to
+`Neos.Neos:AbstractEditor` role definition. Otherwise pages only having your new roles will not be visible in Neos backend.
+This could also lead to error during publishing. 

@@ -6,7 +6,7 @@
 				<p><f:translate package="{settings.translation.packageKey}" id="authentication.backendmessage" source="{settings.translation.sourceName}"/></p>
 			</f:then>
 			<f:else>
-				<f:security.ifHasRole role="Networkteam.Neos.FrontendLogin:FrontendUser">
+				<f:security.ifHasRole role="Networkteam.Neos.FrontendLogin:MemberArea">
 					<f:then>
 						<p>You're logged in as <strong>"{account.accountIdentifier}"</strong></p>
 						<f:form action="logout" controller="Authentication" package="Networkteam.Neos.FrontendLogin" method="post" class="form-horizontal clearfix" additionalAttributes="{role:'form'}">

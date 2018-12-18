@@ -20,6 +20,15 @@
             <trans-unit id="properties.loginFormPage.ui.help.message" xml:space="preserve">
                 <source>Page containing login form</source>
             </trans-unit>
+            <trans-unit id="properties._accessRoles" xml:space="preserve">
+                <source>Access roles</source>
+            </trans-unit>
+            <trans-unit id="properties._accessRoles.ui.help.message" xml:space="preserve">
+                <source>The assigend roles apply for this page and all it's children. That means only frontend users having one of the applied roles are able to see the pages.</source>
+            </trans-unit>
+            <trans-unit id="properties._accessRoles.selectBoxEditor.placeholder" xml:space="preserve">
+                <source>Please select at least one role</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
