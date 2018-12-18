@@ -1,0 +1,5 @@
+prototype(Networkteam.Neos.FrontendLogin:TranslatedValue) < prototype(Neos.Fusion:Value) {
+    id = ''
+    arguments = Neos.Fusion:RawArray
+    value = ${Translation.translate(this.id, null, this.arguments, 'Main', 'Networkteam.Neos.FrontendLogin')}
+}

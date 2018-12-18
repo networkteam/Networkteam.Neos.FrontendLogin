@@ -1,7 +1,4 @@
-##
-# "LoginForm" element, extending "Plugin"
-#
-prototype(Networkteam.Neos.FrontendLogin:LoginForm) < prototype(Neos.Neos:ContentComponent){
+prototype(Networkteam.Neos.FrontendLogin:LoginForm) < prototype(Neos.Neos:ContentComponent) {
     settings = ${Configuration.setting('Networkteam.Neos.FrontendLogin')}
 
     renderer = afx`

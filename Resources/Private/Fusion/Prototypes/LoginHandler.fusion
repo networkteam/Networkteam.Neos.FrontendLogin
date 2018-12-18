@@ -1,7 +1,10 @@
 prototype(Networkteam.Neos.FrontendLogin:LoginHandler) < prototype(Neos.Fusion:Case) {
     inBackend {
+        label = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'loginhandler.inbackend'
+        }
         condition = ${node.context.inBackend}
-        renderer = '<p>In backend Form is disabled</p>'
+        renderer = ${'<p>' + this.label + '</p>'}
     }
 
     showAccount {
@@ -11,6 +14,6 @@ prototype(Networkteam.Neos.FrontendLogin:LoginHandler) < prototype(Neos.Fusion:C
 
     showLoginForm {
         condition = ${true}
-        renderer = Networkteam.Neos.FrontendLogin:ComponentsA.Atoms.LoginForm
+        renderer = Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm
     }
 }

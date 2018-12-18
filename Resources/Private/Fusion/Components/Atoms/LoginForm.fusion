@@ -1,4 +1,4 @@
-prototype(Networkteam.Neos.FrontendLogin:ComponentsA.Atoms.LoginForm) < prototype(Neos.Neos:ContentComponent) {
+prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm) < prototype(Neos.Neos:ContentComponent) {
 
     actionUri = Neos.Fusion:UriBuilder {
         package = 'Networkteam.Neos.FrontendLogin'
@@ -20,23 +20,40 @@ prototype(Networkteam.Neos.FrontendLogin:ComponentsA.Atoms.LoginForm) < prototyp
         }
     }
 
+    redirectOnErrorUri = Neos.Neos:NodeUri {
+        node = ${documentNode}
+        @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
+    }
+
+    labels = Neos.Fusion:RawArray {
+        username = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.loginform.username'
+        }
+        password = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.loginform.password'
+        }
+        submit = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.loginform.submit'
+        }
+    }
+
     renderer = afx`
         <form action={props.actionUri} method="post" class="form-horizontal clearfix">
             <div class="form-group">
-                <label for="networkteam-neos-frontendlogin-username" class="col-lg-4 control-label">Username:</label>
+                <label for="networkteam-neos-frontendlogin-username" class="col-lg-4 control-label">{props.labels.username}:</label>
                 <input name="__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][username]" class="form-control" id="networkteam-neos-frontendlogin-username" type="text" />
             </div>
             <div class="form-group">
-                <label for="networkteam-neos-frontendlogin-password" class="col-lg-4 control-label">Password:</label>
+                <label for="networkteam-neos-frontendlogin-password" class="col-lg-4 control-label">{props.labels.password}:</label>
                 <input name="__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][password]" class="form-control" id="networkteam-neos-frontendlogin-password" type="password" />
             </div>
             <div class="form-group">
                 <div class="pull-right">
-                    <button class="btn btn-primary" >Submit</button>
+                    <button class="btn btn-primary">{props.labels.submit}</button>
                 </div>
             </div>
             <input type="hidden" name="redirectAfterLoginUri" value={props.redirectAfterLoginUri} />
+            <input type="hidden" name="redirectOnErrorUri" value={props.redirectOnErrorUri} />
         </form>
     `
-
 }

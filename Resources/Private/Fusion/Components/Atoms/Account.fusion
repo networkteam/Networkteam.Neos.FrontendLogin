@@ -11,14 +11,23 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.Account) < prototype(N
         @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
     }
 
-
-    account = ${Security.account}
+    labels = Neos.Fusion:RawArray {
+        statusMessage = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.account.statusmessage'
+            arguments {
+                0 = ${Security.account.accountIdentifier}
+            }
+        }
+        logout = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.account.logout'
+        }
+    }
 
     renderer = afx`
         <div>
-            <p>You're logged in as <strong>"{props.account.accountIdentifier}"</strong></p>
+            <p>{props.labels.statusMessage}</p>
             <form action={props.actionUri} method="post" class="form-horizontal clearfix">
-                <button value="Logout" class="btn btn-primary">Logout</button>
+                <button value="Logout" class="btn btn-primary">{props.labels.logout}</button>
                 <input type="hidden" name="redirectAfterLogoutUri" value={props.redirectAfterLogoutUri} />
             </form>
         </div>

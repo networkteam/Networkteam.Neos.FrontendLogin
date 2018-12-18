@@ -93,6 +93,17 @@ class AuthenticationController extends AbstractAuthenticationController
         $title = $this->getTranslationById('authentication.failure.title');
         $message = $this->getTranslationById('authentication.failure.message');
         $this->addFlashMessage($message, $title, Error\Message::SEVERITY_ERROR, [], $exception === null ? 1496914553 : $exception->getCode());
+
+        //TODO: The flashMessage has to be rendered in afx loginForm template, somehow
+
+        try {
+            $redirectOnErrorUri = $this->hashService->validateAndStripHmac(
+                $this->request->getArgument('redirectOnErrorUri')
+            );
+            $this->redirectToUri($redirectOnErrorUri);
+        } catch (\Exception $e) {
+
+        }
     }
 
     /**

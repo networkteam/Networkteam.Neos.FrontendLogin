@@ -12,8 +12,8 @@
         }
     ],
     "require": {
-        "neos/flow": "*",
-        "neos/neos": "~4.0"
+        "neos/neos": "~4.0",
+        "neos/fusion-afx": "*"
     },
     "autoload": {
         "psr-4": {

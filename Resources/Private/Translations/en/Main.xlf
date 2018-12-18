@@ -2,18 +2,25 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
 	<file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" datatype="plaintext">
 		<body>
-			<trans-unit id="authentication.form.username" xml:space="preserve">
+			<trans-unit id="components.atoms.loginform.username" xml:space="preserve">
 				<source>Username</source>
 			</trans-unit>
-			<trans-unit id="authentication.form.password" xml:space="preserve">
+			<trans-unit id="components.atoms.loginform.password" xml:space="preserve">
 				<source>Password</source>
 			</trans-unit>
-			<trans-unit id="authentication.backendmessage" xml:space="preserve">
-				<source>The Frontend User Login Form is disabled in backend mode.</source>
-			</trans-unit>
-			<trans-unit id="authentication.form.submit" xml:space="preserve">
+			<trans-unit id="components.atoms.loginform.submit" xml:space="preserve">
 				<source>Login</source>
 			</trans-unit>
+            <trans-unit id="components.atoms.account.logout" xml:space="preserve">
+				<source>Logout</source>
+			</trans-unit>
+            <trans-unit id="components.atoms.account.statusmessage" xml:space="preserve">
+				<source><![CDATA[You're logged in as <strong>"{0}"</strong>]]></source>
+			</trans-unit>
+            <trans-unit id="loginhandler.inbackend" xml:space="preserve">
+				<source>Form is disabled in backend mode.</source>
+			</trans-unit>
+
 			<trans-unit id="authentication.failure.title" xml:space="preserve">
 				<source>Login failed!</source>
 			</trans-unit>
