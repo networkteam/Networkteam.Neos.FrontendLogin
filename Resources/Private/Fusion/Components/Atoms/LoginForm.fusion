@@ -41,11 +41,11 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm) < prototype
         <form action={props.actionUri} method="post" class="form-horizontal clearfix">
             <div class="form-group">
                 <label for="networkteam-neos-frontendlogin-username" class="col-lg-4 control-label">{props.labels.username}:</label>
-                <input name="__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][username]" class="form-control" id="networkteam-neos-frontendlogin-username" type="text" />
+                <input name="__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][username]" class="form-control" id="networkteam-neos-frontendlogin-username" type="text" required />
             </div>
             <div class="form-group">
                 <label for="networkteam-neos-frontendlogin-password" class="col-lg-4 control-label">{props.labels.password}:</label>
-                <input name="__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][password]" class="form-control" id="networkteam-neos-frontendlogin-password" type="password" />
+                <input name="__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][password]" class="form-control" id="networkteam-neos-frontendlogin-password" type="password" required />
             </div>
             <div class="form-group">
                 <div class="pull-right">
