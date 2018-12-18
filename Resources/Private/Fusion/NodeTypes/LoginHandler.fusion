@@ -1,0 +1,16 @@
+prototype(Networkteam.Neos.FrontendLogin:LoginHandler) < prototype(Neos.Fusion:Case) {
+    inBackend {
+        condition = ${node.context.inBackend}
+        renderer = '<p>In backend Form is disabled</p>'
+    }
+
+    showAccount {
+        condition = ${Security.hasRole('Networkteam.Neos.FrontendLogin:MemberArea')}
+        renderer = Networkteam.Neos.FrontendLogin:Components.Atoms.Account
+    }
+
+    showLoginForm {
+        condition = ${true}
+        renderer = Networkteam.Neos.FrontendLogin:ComponentsA.Atoms.LoginForm
+    }
+}

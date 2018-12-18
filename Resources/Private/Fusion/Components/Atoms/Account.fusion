@@ -1,0 +1,26 @@
+prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.Account) < prototype(Neos.Neos:ContentComponent) {
+
+    actionUri = Neos.Fusion:UriBuilder {
+        package = 'Networkteam.Neos.FrontendLogin'
+        controller = 'Authentication'
+        action = 'logout'
+    }
+
+    redirectAfterLogoutUri = Neos.Neos:NodeUri {
+        node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogout')}
+        @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
+    }
+
+
+    account = ${Security.account}
+
+    renderer = afx`
+        <div>
+            <p>You're logged in as <strong>"{props.account.accountIdentifier}"</strong></p>
+            <form action={props.actionUri} method="post" class="form-horizontal clearfix">
+                <button value="Logout" class="btn btn-primary">Logout</button>
+                <input type="hidden" name="redirectAfterLogoutUri" value={props.redirectAfterLogoutUri} />
+            </form>
+        </div>
+    `
+}

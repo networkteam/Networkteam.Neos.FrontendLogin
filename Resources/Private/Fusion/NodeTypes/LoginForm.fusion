@@ -1,30 +1,16 @@
 ##
 # "LoginForm" element, extending "Plugin"
 #
-prototype(Networkteam.Neos.FrontendLogin:LoginForm) {
+prototype(Networkteam.Neos.FrontendLogin:LoginForm) < prototype(Neos.Neos:ContentComponent){
     settings = ${Configuration.setting('Networkteam.Neos.FrontendLogin')}
 
-    redirectAfterLoginUri = Neos.Fusion:Case {
-        refererIsSetAndValid {
-            condition = ${request.httpRequest.arguments['referer'] && Networkteam.Neos.FrontendLogin.Hash.validate(request.httpRequest.arguments['referer'])}
-            renderer = ${request.httpRequest.arguments['referer']}
-        }
-        default {
-            condition = ${true}
-            renderer = Neos.Neos:NodeUri {
-                node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogin')}
-                @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
-            }
-        }
-    }
-
-    redirectAfterLogoutUri = Neos.Neos:NodeUri {
-        node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogout')}
-        @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
-    }
-
-
-    account = ${Security.account}
+    renderer = afx`
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <Networkteam.Neos.FrontendLogin:LoginHandler />
+            </div>
+        </div>
+    `
 
     @cache {
         mode = 'dynamic'
