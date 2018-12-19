@@ -23,4 +23,5 @@ prototype(Networkteam.Neos.FrontendLogin:LoginForm) < prototype(Neos.Neos:Conten
 # caching configuration
 prototype(Neos.Fusion:GlobalCacheIdentifiers) {
     refererArgument = ${request.httpRequest.arguments.referer}
+    errorArgument = ${request.httpRequest.arguments.error}
 }

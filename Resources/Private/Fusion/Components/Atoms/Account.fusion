@@ -1,5 +1,4 @@
 prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.Account) < prototype(Neos.Neos:ContentComponent) {
-
     actionUri = Neos.Fusion:UriBuilder {
         package = 'Networkteam.Neos.FrontendLogin'
         controller = 'Authentication'
@@ -13,7 +12,7 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.Account) < prototype(N
 
     labels = Neos.Fusion:RawArray {
         statusMessage = Networkteam.Neos.FrontendLogin:TranslatedValue {
-            id = 'components.atoms.account.statusmessage'
+            id = 'components.atoms.account.statusMessage'
             arguments {
                 0 = ${Security.account.accountIdentifier}
             }
