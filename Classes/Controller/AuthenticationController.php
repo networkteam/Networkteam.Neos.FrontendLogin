@@ -8,7 +8,6 @@ use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController;
 use Neos\Flow\Security\Cryptography\HashService;
 use Neos\Flow\Security\Exception\AuthenticationRequiredException;
-use Neos\Error\Messages as Error;
 
 /**
  * Controller for displaying a login/logout form and authenticating/logging out "frontend users"
@@ -88,22 +87,21 @@ class AuthenticationController extends AbstractAuthenticationController
      */
     protected function onAuthenticationFailure(AuthenticationRequiredException $exception = null)
     {
-        $this->flashMessageContainer->flush(Error\Message::SEVERITY_ERROR);
+        try {
+            $redirectUriString = $this->hashService->validateAndStripHmac(
+                $this->request->getArgument('redirectOnErrorUri')
+            );
+            $redirectUri = new \Neos\Flow\Http\Uri($redirectUriString);
+            $redirectUriWithErrorParameter = \Neos\Flow\Http\Helper\UriHelper::uriWithArguments(
+                $redirectUri,
+                [
+                    'error' => 'authenticationFailed'
+                ]
+            );
+            $this->redirectToUri($redirectUriWithErrorParameter);
+        } catch (\Exception $e) {
 
-        $title = $this->getTranslationById('authentication.failure.title');
-        $message = $this->getTranslationById('authentication.failure.message');
-        $this->addFlashMessage($message, $title, Error\Message::SEVERITY_ERROR, [], $exception === null ? 1496914553 : $exception->getCode());
-    }
-
-    /**
-     * Get translation by label id for configured source name and package key
-     *
-     * @param string $labelId Key to use for finding translation
-     * @return string Translated message or NULL on failure
-     */
-    protected function getTranslationById($labelId)
-    {
-        return $this->translator->translateById($labelId, [], null, null, $this->translationSourceName, $this->translationPackageKey);
+        }
     }
 
     /**

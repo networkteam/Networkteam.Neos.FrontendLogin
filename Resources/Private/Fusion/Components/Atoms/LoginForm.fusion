@@ -1,0 +1,85 @@
+prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm) < prototype(Neos.Neos:ContentComponent) {
+    actionUri = Neos.Fusion:UriBuilder {
+        package = 'Networkteam.Neos.FrontendLogin'
+        controller = 'Authentication'
+        action = 'authenticate'
+    }
+
+    redirectAfterLoginUri = Neos.Fusion:Case {
+        refererIsSetAndValid {
+            condition = ${request.httpRequest.arguments['referer'] && Networkteam.Neos.FrontendLogin.Hash.validate(request.httpRequest.arguments['referer'])}
+            renderer = ${request.httpRequest.arguments['referer']}
+        }
+        default {
+            condition = ${true}
+            renderer = Neos.Neos:NodeUri {
+                node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogin')}
+                @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
+            }
+        }
+    }
+
+    redirectOnErrorUri = Neos.Neos:NodeUri {
+        node = ${documentNode}
+        @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
+    }
+
+    errorMessage = Neos.Fusion:Case {
+        hasError {
+            condition = ${request.httpRequest.arguments['error']}
+            renderer =  Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm.Error {
+                message = Networkteam.Neos.FrontendLogin:TranslatedValue {
+                    id = ${'components.atoms.loginform.error.' + request.httpRequest.arguments['error']}
+                }
+            }
+
+        }
+        default {
+            condition = ${true}
+            renderer = ''
+        }
+    }
+
+    labels = Neos.Fusion:RawArray {
+        username = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.loginform.username'
+        }
+        password = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.loginform.password'
+        }
+        submit = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.loginform.submit'
+        }
+    }
+
+    renderer = afx`
+        <div>
+            {props.errorMessage}
+            <form action={props.actionUri} method="post" class="form-horizontal clearfix">
+                <div class="form-group">
+                    <label for="networkteam-neos-frontendlogin-username" class="col-lg-4 control-label">{props.labels.username}:</label>
+                    <input name="__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][username]" class="form-control" id="networkteam-neos-frontendlogin-username" type="text" required />
+                </div>
+                <div class="form-group">
+                    <label for="networkteam-neos-frontendlogin-password" class="col-lg-4 control-label">{props.labels.password}:</label>
+                    <input name="__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][password]" class="form-control" id="networkteam-neos-frontendlogin-password" type="password" required />
+                </div>
+                <div class="form-group">
+                    <div class="pull-right">
+                        <button class="btn btn-primary">{props.labels.submit}</button>
+                    </div>
+                </div>
+                <input type="hidden" name="redirectAfterLoginUri" value={props.redirectAfterLoginUri} />
+                <input type="hidden" name="redirectOnErrorUri" value={props.redirectOnErrorUri} />
+            </form>
+        </div>
+    `
+}
+
+prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm.Error)  < prototype(Neos.Neos:ContentComponent) {
+    message = ''
+    renderer = afx`
+        <p>{props.message}</p>
+    `
+    @if.hasMessage = ${this.message}
+}

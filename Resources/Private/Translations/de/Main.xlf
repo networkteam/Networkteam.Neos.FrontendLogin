@@ -2,29 +2,33 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
     <file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" target-language="de" datatype="plaintext">
         <body>
-            <trans-unit id="authentication.form.username" xml:space="preserve">
+            <trans-unit id="components.atoms.loginform.username" xml:space="preserve">
                 <source>Username</source>
                 <target>Benutzername</target>
             </trans-unit>
-            <trans-unit id="authentication.form.password" xml:space="preserve">
+            <trans-unit id="components.atoms.loginform.password" xml:space="preserve">
                 <source>Password</source>
                 <target>Passwort</target>
             </trans-unit>
-            <trans-unit id="authentication.backendmessage" xml:space="preserve">
-                <source>The Frontend User Login Form is disabled in backend mode.</source>
-                <target>Die Login-Eingabemaske ist im Backend deaktiviert.</target>
-            </trans-unit>
-            <trans-unit id="authentication.form.submit" xml:space="preserve">
+            <trans-unit id="components.atoms.loginform.submit" xml:space="preserve">
                 <source>Login</source>
-                <target>Absenden</target>
+                <target>Anmelden</target>
             </trans-unit>
-            <trans-unit id="authentication.failure.title" xml:space="preserve">
-                <source>Login failed!</source>
-                <target state="translated">Anmeldung fehlgeschlagen!</target>
+            <trans-unit id="components.atoms.account.logout" xml:space="preserve">
+                <source>Logout</source>
+                <target>Abmelden</target>
             </trans-unit>
-            <trans-unit id="authentication.failure.message" xml:space="preserve">
-                <source>With the given credentials the login could not be performed successfully.</source>
-                <target state="translated">Die Anmeldung konnte mit den eingegebenen Zugangsdaten nicht erfolgreich durchgeführt werden.</target>
+            <trans-unit id="components.atoms.account.statusMessage" xml:space="preserve">
+                <source><![CDATA[You're logged in as <strong>"{0}"</strong>]]></source>
+                <target><![CDATA[Du bist als <strong>"{0}"</strong> angemeldet]]></target>
+            </trans-unit>
+            <trans-unit id="components.atoms.loginform.error.authenticationFailed" xml:space="preserve">
+                <source>Authentication failed! The login could not be performed with the given credentials.</source>
+                <target>Anmeldung fehlgeschlagen! Mit den eingegebenen Zugangsdaten konnte die Anmeldung nicht durchgeführt werden.</target>
+            </trans-unit>
+            <trans-unit id="loginhandler.inbackend" xml:space="preserve">
+                <source>Form is disabled in backend mode.</source>
+                <target>Das Formular is im Backend-Modus deaktiviert.</target>
             </trans-unit>
         </body>
     </file>

@@ -1,0 +1,19 @@
+prototype(Networkteam.Neos.FrontendLogin:LoginHandler) < prototype(Neos.Fusion:Case) {
+    inBackend {
+        label = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'loginhandler.inbackend'
+        }
+        condition = ${node.context.inBackend}
+        renderer = ${'<p>' + this.label + '</p>'}
+    }
+
+    showAccount {
+        condition = ${Security.hasRole('Networkteam.Neos.FrontendLogin:MemberArea')}
+        renderer = Networkteam.Neos.FrontendLogin:Components.Atoms.Account
+    }
+
+    showLoginForm {
+        condition = ${true}
+        renderer = Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm
+    }
+}
