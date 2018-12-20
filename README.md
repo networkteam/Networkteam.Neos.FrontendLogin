@@ -1,15 +1,15 @@
 # Networkteam.Neos.FrontendLogin
 
 Neos package for frontend login inspired by  [Flowpack.Neos.FrontendLogin](https://github.com/Flowpack/Flowpack.Neos.FrontendLogin).
-It provides a mixin for member area root pages. The packages makes use of the `accessRoles` property of `NodeInterface`.
+It provides a mixin for MemberAreaRootPages. The package makes use of the `accessRoles` property of `NodeInterface`.
 
 ## Features
 
-* Place a member area root page within your page tree and all pages beneath it including the member area page itself will be protected
+* Place a MemberAreaRootPage within your page tree and all pages beneath it including the member area page itself will be protected
 * Configure redirect page after login and logout 
 * Redirect to configured login form when a protected page is requested without valid login.
   After successful login you will be redirected to initially requested page (referer).
-* Multiple member areas with different roles are possible
+* Multiple member areas with different access roles are possible
 
 ## NodeTypes
 
@@ -32,20 +32,21 @@ This packages makes use of the neos flow security framework. For further details
 [documentation of the flow framework](https://flowframework.readthedocs.io/en/stable/TheDefinitiveGuide/PartIII/Security.html?highlight=roles#defining-privileges-policies).
 
 Two role definitions are provided:
-* **Networkteam.Neos.FrontendLogin:MemberArea** (abstract): Interface for MemberArea roles. Is used within access role selection of MemberAreaRootPages
-* **Networkteam.Neos.FrontendLogin:FrontendUser**
+* **Networkteam.Neos.FrontendLogin:MemberArea** (abstract): Interface for MemberArea roles. It is used within 
+  access role selection of MemberAreaRootPages.
+* **Networkteam.Neos.FrontendLogin:FrontendUser**: Concrete access role implementation
 
 You can define your own frontend user roles by adding them to the `Policy.yaml` of your package. Make sure that you add 
 `Networkteam.Neos.FrontendLogin:MemberArea` as parent role. Otherwise you won't be available to select the role within 
 MemberAreaRootPage node.
 
-When you set access roles on your MemberAreaRootPage and apply the changes, these access roles will be set on all 
+When you set access roles on your MemberAreaRootPage via the inspector and apply the changes, these access roles will be set on all 
 DocumentNodes beneath that MemberAreaRootPage as well. This ensures that all theses pages can only be access by users 
 having one of the selected roles.
 
 ## Create Frontend Users
 
-To create a new Frontend User you can use the *neos.neos:user:create* command, e.g.
+To create a new Frontend User you can use the `neos.neos:user:create` command, e.g.
  
 ```bash
 ./flow user:create --authentication-provider "Networkteam.Neos.FrontendLogin:Frontend" --roles "Networkteam.Neos.FrontendLogin:FrontendUser"
@@ -81,7 +82,7 @@ For your defined nodeType you need a suitable fusion object. An example configur
 
 *Packages/Application/Your.Package/Resources/Private/Fusion/MemberAreaRootPage.fusion*
 ```fusion
-# Member Area Root page
+# MemberAreaRootPage
 prototype(Your.Package:MemberAreaRootPage) < prototype(Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot) {
 
 }
@@ -90,12 +91,14 @@ prototype(Your.Package:MemberAreaRootPage) < prototype(Networkteam.Neos.Frontend
 ### Add pages and login form
 
 Now you can log into Neos backend and create a new **MemberAreaRootPage**. Define which users should have access to this 
-member area by selecting access roles and apply the changes. 
+member area by selecting access roles and apply the changes.
 
 Next you need to add a **login form** on a page which is not protected. Do not place the login form within 
-your member area or the member area root page. Otherwise your users won't be able to access the login form.
+your member area or the MemberAreaRootPage. Otherwise your users won't be able to access the login form.
 
-Additionally you can add further pages beneath your member area root page. They will be protected.
+Now go back to the previously create MemberAreaRootPage and select the page containing the login form (`Login form page`).
+
+Additionally you can add further pages beneath your MemberAreaRootPage. They will be protected.
 
 ## Adding your own MemberArea roles
 
