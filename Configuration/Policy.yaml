@@ -21,5 +21,4 @@ roles:
 
   'Neos.Neos:AbstractEditor':
     # If you introduce new roles of type 'Networkteam.Neos.FrontendLogin:MemberArea' make sure adding them to parentRoles of 'Neos.Neos:AbstractEditor'
-    parentRoles:
-      - 'Networkteam.Neos.FrontendLogin:FrontendUser'
+    parentRoles: ['Networkteam.Neos.FrontendLogin:FrontendUser']
