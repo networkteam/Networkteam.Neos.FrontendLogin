@@ -1,7 +1,7 @@
 {
     "name": "networkteam/neos-frontendlogin",
     "type": "neos-package",
-    "description": "A Neos package building up member area with frontend login",
+    "description": "A Neos package for building up member areas with frontend login",
     "license": [
         "GPL-3.0-or-later"
     ],
@@ -24,5 +24,8 @@
         "neos": {
             "package-key": "Networkteam.Neos.FrontendLogin"
         }
+    },
+    "suggest": {
+        "networkteam/neos-passwordreset": "Allow users to reset their user account password within the frontend."
     }
 }
