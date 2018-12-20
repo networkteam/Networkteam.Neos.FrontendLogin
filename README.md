@@ -116,3 +116,7 @@ roles:
   'Neos.Neos:AbstractEditor':
     parentRoles: ['Your.Package:UserWithFrontendAccess']
 ```
+
+## Password reset
+
+To give your frontend users the possibility to reset there password you can install and use the package [Networkteam.Neos.PasswordReset](https://github.com/networkteam/Networkteam.Neos.PasswordReset).
