@@ -36,6 +36,7 @@ Neos:
   Fusion:
     defaultContext:
       Networkteam.Neos.FrontendLogin.Hash: \Networkteam\Neos\FrontendLogin\Eel\HashHelper
+      Networkteam.Neos.FrontendLogin.User: \Networkteam\Neos\FrontendLogin\Eel\UserHelper
 
 Networkteam:
   Neos:
@@ -44,3 +45,4 @@ Networkteam:
         packageKey: 'Networkteam.Neos.FrontendLogin'
         sourceName: 'Main'
       redirectOnLoginLogoutExceptionUri: '/'
+      authenticationProviderName: 'Networkteam.Neos.FrontendLogin:Frontend'

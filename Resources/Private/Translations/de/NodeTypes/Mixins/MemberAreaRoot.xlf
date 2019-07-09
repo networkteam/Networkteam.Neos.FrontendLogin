@@ -2,10 +2,6 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
     <file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" target-language="de" datatype="plaintext">
         <body>
-            <trans-unit id="groups.frontendLogin" xml:space="preserve">
-                <source>Member area</source>
-                <target state="translated">Mitgliederbereich</target>
-            </trans-unit>
             <trans-unit id="ui.label" xml:space="preserve">
                 <source>Member area root page</source>
                 <target state="translated">Startseite des Mitgliederbereichs</target>

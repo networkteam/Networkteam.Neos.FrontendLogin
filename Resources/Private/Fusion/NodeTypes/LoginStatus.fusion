@@ -1,0 +1,8 @@
+prototype(Networkteam.Neos.FrontendLogin:LoginStatus) < prototype(Neos.Neos:ContentComponent) {
+    user = ${Networkteam.Neos.FrontendLogin.User.getCurrentUser()}
+
+    renderer = afx`
+        <p>Hallo {props.user.name.firstName} {props.user.name.lastName},</p>
+        <Networkteam.Neos.FrontendLogin:Components.Atoms.Account />
+    `
+}

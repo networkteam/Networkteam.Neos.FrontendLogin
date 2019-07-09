@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" target-language="de" datatype="plaintext">
+        <body>
+            <trans-unit id="groups.frontendLogin" xml:space="preserve">
+                <source>Member area</source>
+                <target>Mitgliederbereich</target>
+            </trans-unit>
+            <trans-unit id="groups.frontendLogin.actions" xml:space="preserve">
+                <source>Actions</source>
+                <target>Aktionen</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
