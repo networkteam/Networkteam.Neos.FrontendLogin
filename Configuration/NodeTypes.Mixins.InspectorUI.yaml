@@ -1,89 +1,12 @@
-'Esn.Dna.Base:InspectorUi':
+'Networkteam.Neos.FrontendLogin:Mixins.InspectorUi':
   abstract: true
   ui:
     inspector:
-      tabs:
-        settingsResponsivity:
-          label: 'Esn.Dna.Base:Main:tabs.settingsResponsivity'
-          position: 'after default'
-          icon: icon-arrows-h
-        theme:
-          label: i18n
-          position: 'end'
-          icon: icon-paint-brush
       groups:
-        general:
-          label: 'Esn.Dna.Base:Main:groups.general'
-          icon: icon-gears
-        options:
-          label: 'Neos.NodeTypes:NodeTypes.Menu:groups.options'
-          icon: icon-sliders
-        layout:
-          label: 'Neos.NodeTypes:NodeTypes.Page:groups.layout'
-          icon: icon-paint-brush
-        layoutResponsivity:
-          label: 'Neos.NodeTypes:NodeTypes.Page:groups.layout'
-          icon: icon-paint-brush
-          tab: settingsResponsivity
-        phoneResponsivity:
-          label: 'Esn.Dna.Base:Main:groups.phoneResponsivity'
-          icon: icon-mobile-phone
-          tab: settingsResponsivity
-        phabletResponsivity:
-          label: 'Esn.Dna.Base:Main:groups.phabletResponsivity'
-          icon: icon-tablet
-          tab: settingsResponsivity
-        tabletResponsivity:
-          label: 'Esn.Dna.Base:Main:groups.tabletResponsivity'
-          icon: icon-laptop
-          tab: settingsResponsivity
-        desktopResponsivity:
-          label: 'Esn.Dna.Base:Main:groups.desktopResponsivity'
-          icon: icon-desktop
-          tab: settingsResponsivity
-        largeDesktopResponsivity:
-          label: 'Esn.Dna.Base:Main:groups.largeDesktopResponsivity'
-          icon: icon-television
-          tab: settingsResponsivity
-        behaviour:
-          label: 'Esn.Dna.Base:Main:groups.behaviour'
-          icon: icon-arrows
-        animation:
-          label: 'Esn.Dna.Base:Main:groups.animation'
-        image:
-          label: 'Neos.NodeTypes:NodeTypes.ImageMixin:groups.image'
-          icon: icon-image
-        references:
-          label: 'Neos.NodeTypes.ContentReferences:NodeTypes.ContentReferences:groups.references'
-          icon: icon-copy
-        resources:
-          label: 'Neos.NodeTypes:NodeTypes.AssetList:groups.resources'
-          icon: icon-files-o
-        column:
-          label: 'Neos.NodeTypes:NodeTypes.Column:groups.column'
-          icon: icon-columns
-        form:
-          label: 'Neos.NodeTypes:NodeTypes.Form:groups.form'
-          icon: icon-envelope-alt
-        html:
-          label: 'Neos.NodeTypes:NodeTypes.Html:groups.html'
-          icon: icon-code
-        menu:
-          label: 'Esn.Dna.Base:Main:groups.menu'
-          icon: icon-bars
-        address:
-          label: 'Esn.Dna.Base:Main:groups.address'
-          icon: 'far fa-address-card'
-        tracking:
-          label: 'Esn.Dna.Base:Main:groups.tracking'
-          icon: icon-heartbeat
-        pluginViews:
-          label: 'Neos.Neos:NodeTypes.PluginView:groups.pluginViews'
-          icon: icon-eye-slash
-        stage:
-          label: 'Esn.Dna.Base:Main:groups.stage'
-          icon: icon-star
-        themeColors:
-          label: 'Esn.Dna.Base:Main:groups.themeColors'
-          icon: icon-palette
-          tab: theme
+        'frontendLogin':
+          label: i18n
+          icon: 'fas fa-user-lock'
+          position: 'after document'
+        'frontendLogin.actions':
+          label: i18n
+          icon: 'icon-link'
