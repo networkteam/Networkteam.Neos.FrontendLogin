@@ -23,14 +23,12 @@
     "extra": {
         "neos": {
             "package-key": "Networkteam.Neos.FrontendLogin"
+        },
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
         }
     },
     "suggest": {
         "networkteam/neos-passwordreset": "Allow users to reset their user account password within the frontend."
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0.x-dev"
-        }
     }
 }
