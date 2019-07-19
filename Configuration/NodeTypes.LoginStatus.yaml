@@ -1,0 +1,8 @@
+'Networkteam.Neos.FrontendLogin:LoginStatus':
+  superTypes:
+    'Neos.Neos:Content': true
+    'Networkteam.Neos.FrontendLogin:Mixins.RedirectAfterLogout': true
+    'Networkteam.Neos.FrontendLogin:Mixins.InspectorUi': true
+  ui:
+    label: i18n
+    icon: 'icon-id-card'

@@ -1,0 +1,12 @@
+'Networkteam.Neos.FrontendLogin:Mixins.InspectorUi':
+  abstract: true
+  ui:
+    inspector:
+      groups:
+        'frontendLogin':
+          label: i18n
+          icon: 'fas fa-user-lock'
+          position: 'after document'
+        'frontendLogin.actions':
+          label: i18n
+          icon: 'icon-link'

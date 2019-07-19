@@ -24,7 +24,7 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.Account) < prototype(N
 
     renderer = afx`
         <div>
-            <p>{props.labels.statusMessage}</p>
+            <p @if.hasStatusMessage={!String.isBlank(props.labels.statusMessage)}>{props.labels.statusMessage}</p>
             <form action={props.actionUri} method="post" class="form-horizontal clearfix">
                 <button value="Logout" class="btn btn-primary">{props.labels.logout}</button>
                 <input type="hidden" name="redirectAfterLogoutUri" value={props.redirectAfterLogoutUri} />
