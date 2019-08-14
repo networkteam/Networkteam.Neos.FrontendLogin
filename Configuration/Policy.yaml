@@ -15,6 +15,9 @@ roles:
 
   'Networkteam.Neos.FrontendLogin:MemberArea':
     abstract: true
+    privileges:
+      - privilegeTarget: 'Networkteam.Neos.PasswordReset:PasswordChange'
+        permission: GRANT
 
   'Networkteam.Neos.FrontendLogin:FrontendUser':
     parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
