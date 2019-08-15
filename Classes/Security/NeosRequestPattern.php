@@ -41,7 +41,7 @@ class NeosRequestPattern implements RequestPatternInterface
         }
         $shouldMatchFrontend = isset($this->options['matchFrontend']) && $this->options['matchFrontend'] === true;
         $requestPath = $request->getHttpRequest()->getUri()->getPath();
-        $requestPathMatchesBackend = substr($requestPath, 0, 5) === '/neos' || strpos($requestPath, '@') !== false;
+        $requestPathMatchesBackend = substr($requestPath, 0, 5) === '/neos' || strpos($requestPath, '@') !== false || substr($requestPath, 0, 10) === '/sitegeist';
         return $shouldMatchFrontend !== $requestPathMatchesBackend;
     }
 
