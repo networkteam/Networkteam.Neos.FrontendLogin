@@ -24,22 +24,8 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm) < prototype
         @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
     }
 
-    errorMessage = Neos.Fusion:Case {
-        hasError {
-            condition = ${request.httpRequest.arguments['error']}
-            renderer =  Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm.Error {
-                message = Networkteam.Neos.FrontendLogin:TranslatedValue {
-                    id = ${'components.atoms.loginform.error.' + request.httpRequest.arguments['error']}
-                }
-            }
-
-        }
-        default {
-            condition = ${true}
-            renderer = ''
-        }
-    }
-
+    flashMessages = Networkteam.Neos.FrontendLogin:FlashMessages
+    hasError = ${request.httpRequest.arguments['error']}
     labels = Neos.Fusion:RawArray {
         username = Networkteam.Neos.FrontendLogin:TranslatedValue {
             id = 'components.atoms.loginform.username'
@@ -52,9 +38,23 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm) < prototype
         }
     }
 
+    @cache {
+        mode = 'uncached'
+        context {
+            1 = 'node'
+            2 = 'documentNode'
+            3 = 'site'
+        }
+    }
+
     renderer = afx`
         <div>
-            {props.errorMessage}
+            <div class="flash-messages" @if.hasFlashMessages={props.flashMessages}>
+                <Neos.Fusion:Loop items={props.flashMessages} @children="itemRenderer">
+                    <p>{item.message}</p>
+                </Neos.Fusion:Loop>
+            </div>
+
             <form action={props.actionUri} method="post" class="form-horizontal clearfix">
                 <div class="form-group">
                     <label for="networkteam-neos-frontendlogin-username" class="col-lg-4 control-label">{props.labels.username}:</label>
@@ -74,12 +74,4 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm) < prototype
             </form>
         </div>
     `
-}
-
-prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm.Error)  < prototype(Neos.Neos:ContentComponent) {
-    message = ''
-    renderer = afx`
-        <p>{props.message}</p>
-    `
-    @if.hasMessage = ${this.message}
 }

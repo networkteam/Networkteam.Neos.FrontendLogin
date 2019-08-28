@@ -24,6 +24,7 @@ Neos:
         autoInclude:
           Networkteam.Neos.FrontendLogin:
             - 'NodeTypes/*'
+            - Main
     fusion:
       autoInclude:
         'Networkteam.Neos.FrontendLogin': true
@@ -41,8 +42,5 @@ Neos:
 Networkteam:
   Neos:
     FrontendLogin:
-      translation:
-        packageKey: 'Networkteam.Neos.FrontendLogin'
-        sourceName: 'Main'
       redirectOnLoginLogoutExceptionUri: '/'
       authenticationProviderName: 'Networkteam.Neos.FrontendLogin:Frontend'

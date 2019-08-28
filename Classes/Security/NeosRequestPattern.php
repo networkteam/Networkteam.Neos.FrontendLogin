@@ -1,5 +1,4 @@
 <?php
-
 namespace Networkteam\Neos\FrontendLogin\Security;
 
 

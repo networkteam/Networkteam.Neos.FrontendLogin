@@ -2,6 +2,7 @@
 
 namespace Networkteam\Neos\FrontendLogin\Controller;
 
+use Neos\Error\Messages\Error;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\I18n\Translator;
 use Neos\Flow\Mvc\ActionRequest;
@@ -19,18 +20,6 @@ class AuthenticationController extends AbstractAuthenticationController
      * @Flow\Inject
      */
     protected $translator;
-
-    /**
-     * @Flow\InjectConfiguration(package="Networkteam.Neos.FrontendLogin", path="translation.packageKey")
-     * @var string
-     */
-    protected $translationPackageKey;
-
-    /**
-     * @Flow\InjectConfiguration(package="Networkteam.Neos.FrontendLogin", path="translation.sourceName")
-     * @var string
-     */
-    protected $translationSourceName;
 
     /**
      * @Flow\InjectConfiguration(package="Networkteam.Neos.FrontendLogin", path="redirectOnLoginLogoutExceptionUri")
@@ -91,6 +80,7 @@ class AuthenticationController extends AbstractAuthenticationController
             $redirectUriString = $this->hashService->validateAndStripHmac(
                 $this->request->getArgument('redirectOnErrorUri')
             );
+
             $redirectUri = new \Neos\Flow\Http\Uri($redirectUriString);
             $redirectUriWithErrorParameter = \Neos\Flow\Http\Helper\UriHelper::uriWithArguments(
                 $redirectUri,
@@ -98,8 +88,15 @@ class AuthenticationController extends AbstractAuthenticationController
                     'error' => 'authenticationFailed'
                 ]
             );
+
+            $error = new Error(
+                $this->translator->translateById('authentication.onAuthenticationFailure.authenticationFailed', [], null, null, 'Main', 'Networkteam.Neos.FrontendLogin'),
+                1566923371
+            );
+            $this->flashMessageContainer->addMessage($error);
+
             $this->redirectToUri($redirectUriWithErrorParameter);
-        } catch (\Exception $e) {
+        } catch (\Neos\Flow\Security\Exception $e) {
 
         }
     }

@@ -10,13 +10,12 @@ prototype(Networkteam.Neos.FrontendLogin:LoginForm) < prototype(Neos.Neos:Conten
     `
 
     @cache {
-        mode = 'dynamic'
+        mode = 'uncached'
         context {
             1 = 'node'
             2 = 'documentNode'
             3 = 'site'
         }
-        entryDiscriminator = ${request.httpRequest.methodSafe ? 'static' : false}
     }
 }
 
