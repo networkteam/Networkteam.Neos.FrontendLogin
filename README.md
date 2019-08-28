@@ -120,3 +120,30 @@ roles:
 ## Password reset
 
 To give your frontend users the possibility to reset there password you can install and use the package [Networkteam.Neos.PasswordReset](https://github.com/networkteam/Networkteam.Neos.PasswordReset).
+
+## Translation
+
+To translate the login error message or login form labels create a xliff file for each language in your package and 
+set properties `original="Main"` and `product-name="Networkteam.Neos.FrontendLogin"` on `<file>` tag. Now you can
+override the language keys from the original translation file of `Networkteam.Neos.FrontendLogin` package you like.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file original="Main" product-name="Networkteam.Neos.FrontendLogin" source-language="en" datatype="plaintext">
+        <body>
+            <trans-unit id="components.atoms.loginform.username" xml:space="preserve">
+                <source>Enter your username</source>
+            </trans-unit>
+            <trans-unit id="components.atoms.loginform.password" xml:space="preserve">
+                <source>Enter your password</source>
+            </trans-unit>
+
+            <trans-unit id="authentication.onAuthenticationFailure.authenticationFailed" xml:space="preserve">
+                <source><![CDATA[<strong>Authentication failed!</strong><br />The login could not be performed with the given credentials.]]></source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+
+```

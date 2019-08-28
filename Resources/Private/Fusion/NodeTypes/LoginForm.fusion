@@ -8,16 +8,6 @@ prototype(Networkteam.Neos.FrontendLogin:LoginForm) < prototype(Neos.Neos:Conten
             </div>
         </div>
     `
-
-    @cache {
-        mode = 'dynamic'
-        context {
-            1 = 'node'
-            2 = 'documentNode'
-            3 = 'site'
-        }
-        entryDiscriminator = ${request.httpRequest.methodSafe ? 'static' : false}
-    }
 }
 
 # caching configuration

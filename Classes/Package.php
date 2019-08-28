@@ -7,7 +7,6 @@ namespace Networkteam\Neos\FrontendLogin;
 
 use Neos\ContentRepository\Domain\Model\Node;
 use Neos\Flow\Core\Bootstrap;
-use Neos\ContentRepository\Domain\Service\Context;
 use Networkteam\Neos\FrontendLogin\Service\NodeAccessService;
 
 class Package extends \Neos\Flow\Package\Package

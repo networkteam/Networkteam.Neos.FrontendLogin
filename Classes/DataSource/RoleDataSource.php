@@ -6,10 +6,10 @@ namespace Networkteam\Neos\FrontendLogin\DataSource;
  ***************************************************************/
 
 use Neos\ContentRepository\Domain\Model\NodeInterface;
-use Neos\Flow\Security\Policy\Role;
 use Neos\Flow\Annotations as Flow;
+use Neos\Neos\Service\DataSource\AbstractDataSource;
 
-class RoleDataSource extends \Neos\Neos\Service\DataSource\AbstractDataSource
+class RoleDataSource extends AbstractDataSource
 {
 
     /**

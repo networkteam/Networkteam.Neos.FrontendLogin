@@ -6,12 +6,9 @@ namespace Networkteam\Neos\FrontendLogin\Service;
  *  (c) 2018 networkteam GmbH - all rights reserved
  ***************************************************************/
 
-use Neos\ContentRepository\Domain\Model\Node;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Flow\Annotations as Flow;
-use Neos\Flow\Security\Policy\PolicyService;
-use Networkteam\Neos\FrontendLogin\DataSource\RoleDataSource;
 
 /**
  * @Flow\Scope("singleton")

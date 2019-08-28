@@ -14,6 +14,8 @@ prototype(Networkteam.Neos.FrontendLogin:LoginHandler) < prototype(Neos.Fusion:C
 
     showLoginForm {
         condition = ${true}
-        renderer = Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm
+        renderer = Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm {
+            flashMessages = Networkteam.Neos.FrontendLogin:FlashMessages
+        }
     }
 }

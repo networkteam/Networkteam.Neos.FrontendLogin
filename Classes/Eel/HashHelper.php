@@ -5,10 +5,11 @@ namespace Networkteam\Neos\FrontendLogin\Eel;
  *  (c) 2018 networkteam GmbH - all rights reserved
  ***************************************************************/
 
+use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Security\Cryptography\HashService;
 
-class HashHelper implements \Neos\Eel\ProtectedContextAwareInterface
+class HashHelper implements ProtectedContextAwareInterface
 {
 
     /**
