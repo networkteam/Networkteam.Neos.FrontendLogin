@@ -8,15 +8,6 @@ prototype(Networkteam.Neos.FrontendLogin:LoginForm) < prototype(Neos.Neos:Conten
             </div>
         </div>
     `
-
-    @cache {
-        mode = 'uncached'
-        context {
-            1 = 'node'
-            2 = 'documentNode'
-            3 = 'site'
-        }
-    }
 }
 
 # caching configuration
