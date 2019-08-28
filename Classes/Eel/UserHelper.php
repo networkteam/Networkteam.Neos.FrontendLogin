@@ -11,7 +11,6 @@ use Neos\Flow\Security\Context;
 use Neos\Neos\Domain\Model\User;
 use Neos\Neos\Domain\Service\UserService;
 
-
 class UserHelper implements ProtectedContextAwareInterface
 {
 

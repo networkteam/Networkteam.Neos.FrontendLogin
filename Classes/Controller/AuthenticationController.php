@@ -1,6 +1,9 @@
 <?php
-
 namespace Networkteam\Neos\FrontendLogin\Controller;
+
+/***************************************************************
+ *  (c) 2019 networkteam GmbH - all rights reserved
+ ***************************************************************/
 
 use Neos\Error\Messages\Error;
 use Neos\Flow\Annotations as Flow;
@@ -10,9 +13,7 @@ use Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationControlle
 use Neos\Flow\Security\Cryptography\HashService;
 use Neos\Flow\Security\Exception\AuthenticationRequiredException;
 
-/**
- * Controller for displaying a login/logout form and authenticating/logging out "frontend users"
- */
+
 class AuthenticationController extends AbstractAuthenticationController
 {
     /**
