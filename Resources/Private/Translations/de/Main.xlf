@@ -22,9 +22,13 @@
                 <source><![CDATA[You're logged in as <strong>"{0}"</strong>]]></source>
                 <target><![CDATA[Du bist als <strong>"{0}"</strong> angemeldet]]></target>
             </trans-unit>
-            <trans-unit id="authentication.onAuthenticationFailure.authenticationFailed" xml:space="preserve">
-                <source>Authentication failed! The login could not be performed with the given credentials.</source>
-                <target>Anmeldung fehlgeschlagen! Mit den eingegebenen Zugangsdaten konnte die Anmeldung nicht durchgeführt werden.</target>
+            <trans-unit id="authentication.onAuthenticationFailure.authenticationFailed.title" xml:space="preserve">
+                <source>Authentication failed!</source>
+                <target>Anmeldung fehlgeschlagen!</target>
+            </trans-unit>
+            <trans-unit id="authentication.onAuthenticationFailure.authenticationFailed.body" xml:space="preserve">
+                <source>The login could not be performed with the given credentials.</source>
+                <target>Mit den eingegebenen Zugangsdaten konnte die Anmeldung nicht durchgeführt werden.</target>
             </trans-unit>
             <trans-unit id="loginhandler.inbackend" xml:space="preserve">
                 <source>Form is disabled in backend mode.</source>

@@ -90,16 +90,19 @@ class AuthenticationController extends AbstractAuthenticationController
                 ]
             );
 
-            $error = new Error(
-                $this->translator->translateById('authentication.onAuthenticationFailure.authenticationFailed', [], null, null, 'Main', 'Networkteam.Neos.FrontendLogin'),
-                1566923371
-            );
-            $this->flashMessageContainer->addMessage($error);
-
+            $this->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
             $this->redirectToUri($redirectUriWithErrorParameter);
         } catch (\Neos\Flow\Security\Exception $e) {
 
         }
+    }
+
+    protected function addErrorMessage(string $labelId, int $code, array $labelArguments = []): void
+    {
+        $message = $this->translator->translateById(sprintf('%s.body', $labelId), $labelArguments,null,null,'Main','Networkteam.Neos.FrontendLogin');
+        $title = $this->translator->translateById(sprintf('%s.title', $labelId), [],null,null,'Main','Networkteam.Neos.FrontendLogin');
+        $error = new Error($message, $code, [], $title);
+        $this->flashMessageContainer->addMessage($error);
     }
 
     /**

@@ -51,7 +51,7 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm) < prototype
         <div>
             <div class="flash-messages" @if.hasFlashMessages={props.flashMessages}>
                 <Neos.Fusion:Loop items={props.flashMessages} @children="itemRenderer">
-                    <p>{item.message}</p>
+                    <p><strong>{item.title}</strong> {item.message}</p>
                 </Neos.Fusion:Loop>
             </div>
 

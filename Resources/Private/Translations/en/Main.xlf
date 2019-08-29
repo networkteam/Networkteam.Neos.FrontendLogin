@@ -17,8 +17,11 @@
             <trans-unit id="components.atoms.account.statusMessage" xml:space="preserve">
                 <source><![CDATA[You're logged in as <strong>"{0}"</strong>]]></source>
             </trans-unit>
-            <trans-unit id="authentication.onAuthenticationFailure.authenticationFailed" xml:space="preserve">
-                <source>Authentication failed! The login could not be performed with the given credentials.</source>
+            <trans-unit id="authentication.onAuthenticationFailure.authenticationFailed.title" xml:space="preserve">
+                <source>Authentication failed!</source>
+            </trans-unit>
+            <trans-unit id="authentication.onAuthenticationFailure.authenticationFailed.body" xml:space="preserve">
+                <source>The login could not be performed with the given credentials.</source>
             </trans-unit>
             <trans-unit id="loginhandler.inbackend" xml:space="preserve">
                 <source>Form is disabled in backend mode.</source>
