@@ -77,6 +77,8 @@ class AuthenticationController extends AbstractAuthenticationController
      */
     protected function onAuthenticationFailure(AuthenticationRequiredException $exception = null)
     {
+        $this->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
+
         try {
             $redirectUriString = $this->hashService->validateAndStripHmac(
                 $this->request->getArgument('redirectOnErrorUri')
@@ -90,7 +92,6 @@ class AuthenticationController extends AbstractAuthenticationController
                 ]
             );
 
-            $this->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
             $this->redirectToUri($redirectUriWithErrorParameter);
         } catch (\Neos\Flow\Security\Exception $e) {
 
