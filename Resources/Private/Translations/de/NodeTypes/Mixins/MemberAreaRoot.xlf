@@ -4,7 +4,7 @@
         <body>
             <trans-unit id="ui.label" xml:space="preserve">
                 <source>Member area root page</source>
-                <target state="translated">Startseite des Mitgliederbereichs</target>
+                <target>Startseite des Mitgliederbereichs</target>
             </trans-unit>
             <trans-unit id="ui.help.message" xml:space="preserve">
                 <source>All DocumentNodes beneath member area root page and the member area root page itself are protected and not accessable for website users. Only logged in frontend users having **Networkteam.Neos.FrontendLogin:FrontendUser** role are able to see these nodes.</source>
@@ -12,12 +12,27 @@
             </trans-unit>
             <trans-unit id="properties.title" xml:space="preserve">
                 <source>Member area</source>
+                <target>Mitgliederbereich</target>
             </trans-unit>
             <trans-unit id="properties.loginFormPage" xml:space="preserve">
                 <source>Login form page</source>
+                <target>Loginformular Seite</target>
             </trans-unit>
             <trans-unit id="properties.loginFormPage.ui.help.message" xml:space="preserve">
                 <source>Page containing login form</source>
+                <target>Seite die das Loginformular enthält</target>
+            </trans-unit>
+            <trans-unit id="properties._accessRoles" xml:space="preserve">
+                <source>Access roles</source>
+                <target>Zugriffsrollen</target>
+            </trans-unit>
+            <trans-unit id="properties._accessRoles.ui.help.message" xml:space="preserve">
+                <source>The assigend roles apply for this page and all it's children. That means only frontend users having one of the applied roles are able to see the pages.</source>
+                <target>Die zugewiesenen Rollen gelten für diese Seite und alle ihre Kinder. Das bedeutet, dass nur Frontend-Benutzer mit einer der konfigurierten Rollen die Seiten sehen können.</target>
+            </trans-unit>
+            <trans-unit id="properties._accessRoles.selectBoxEditor.placeholder" xml:space="preserve">
+                <source>Please select at least one role</source>
+                <target>Bitte wählen Sie mindestens eine Rolle aus</target>
             </trans-unit>
         </body>
     </file>
