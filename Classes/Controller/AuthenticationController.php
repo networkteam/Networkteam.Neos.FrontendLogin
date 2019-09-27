@@ -5,22 +5,20 @@ namespace Networkteam\Neos\FrontendLogin\Controller;
  *  (c) 2019 networkteam GmbH - all rights reserved
  ***************************************************************/
 
-use Neos\Error\Messages\Error;
 use Neos\Flow\Annotations as Flow;
-use Neos\Flow\I18n\Translator;
 use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController;
 use Neos\Flow\Security\Cryptography\HashService;
 use Neos\Flow\Security\Exception\AuthenticationRequiredException;
-
+use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelper;
 
 class AuthenticationController extends AbstractAuthenticationController
 {
     /**
-     * @var Translator
      * @Flow\Inject
+     * @var FlashMessageHelper
      */
-    protected $translator;
+    protected $flashMessageHelper;
 
     /**
      * @Flow\InjectConfiguration(package="Networkteam.Neos.FrontendLogin", path="redirectOnLoginLogoutExceptionUri")
@@ -77,7 +75,7 @@ class AuthenticationController extends AbstractAuthenticationController
      */
     protected function onAuthenticationFailure(AuthenticationRequiredException $exception = null)
     {
-        $this->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
+        $this->flashMessageHelper->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
 
         try {
             $redirectUriString = $this->hashService->validateAndStripHmac(
@@ -96,14 +94,6 @@ class AuthenticationController extends AbstractAuthenticationController
         } catch (\Neos\Flow\Security\Exception $e) {
 
         }
-    }
-
-    protected function addErrorMessage(string $labelId, int $code, array $labelArguments = []): void
-    {
-        $message = $this->translator->translateById(sprintf('%s.body', $labelId), $labelArguments,null,null,'Main','Networkteam.Neos.FrontendLogin');
-        $title = $this->translator->translateById(sprintf('%s.title', $labelId), [],null,null,'Main','Networkteam.Neos.FrontendLogin');
-        $error = new Error($message, $code, [], $title);
-        $this->flashMessageContainer->addMessage($error);
     }
 
     /**
