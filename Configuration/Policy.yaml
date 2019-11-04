@@ -24,4 +24,4 @@ roles:
     # adding them to parentRoles of 'Neos.Neos:AbstractEditor' with a named key (without a named key parentRoles
     # defined by other packages might be overwritten)
     parentRoles:
-      frontendUser: 'Networkteam.Neos.FrontendLogin:FrontendUser'
+      'Networkteam.Neos.FrontendLogin:FrontendUser': 'Networkteam.Neos.FrontendLogin:FrontendUser'
