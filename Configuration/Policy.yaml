@@ -20,5 +20,8 @@ roles:
     parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
 
   'Neos.Neos:AbstractEditor':
-    # If you introduce new roles of type 'Networkteam.Neos.FrontendLogin:MemberArea' make sure adding them to parentRoles of 'Neos.Neos:AbstractEditor'
-    parentRoles: ['Networkteam.Neos.FrontendLogin:FrontendUser']
+    # If you introduce new roles of type 'Networkteam.Neos.FrontendLogin:MemberArea' make sure
+    # adding them to parentRoles of 'Neos.Neos:AbstractEditor' with a named key (without a named key parentRoles
+    # defined by other packages might be overwritten)
+    parentRoles:
+      frontendUser: 'Networkteam.Neos.FrontendLogin:FrontendUser'
