@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" target-language="de" datatype="plaintext">
+        <body>
+            <trans-unit id="properties.redirectAfterLogout" xml:space="preserve">
+                <source>Page after logout</source>
+                <target>Seite nach Abmeldung</target>
+            </trans-unit>
+            <trans-unit id="properties.redirectAfterLogout.ui.help.message" xml:space="preserve">
+                <source>Choose a page outside of member area.</source>
+                <target>Wählen sie eine Seite außerhalb des Mitgliederbereiches aus.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
