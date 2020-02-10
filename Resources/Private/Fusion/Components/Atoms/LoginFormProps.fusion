@@ -1,0 +1,51 @@
+prototype(Networkteam.Neos.FrontendLogin:Components.Atom.LoginFormProps) < prototype(Neos.Neos:ContentComponent) {
+    actionUri = Neos.Fusion:UriBuilder {
+        package = 'Networkteam.Neos.FrontendLogin'
+        controller = 'Authentication'
+        action = 'authenticate'
+    }
+
+    redirectAfterLoginUri = Neos.Fusion:Case {
+        refererIsSetAndValid {
+            condition = ${request.httpRequest.arguments['referer'] && Networkteam.Neos.FrontendLogin.Hash.validate(request.httpRequest.arguments['referer'])}
+            renderer = ${request.httpRequest.arguments['referer']}
+        }
+        default {
+            condition = ${true}
+            renderer = Neos.Neos:NodeUri {
+                node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogin')}
+                @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
+            }
+        }
+    }
+
+    redirectOnErrorUri = Neos.Neos:NodeUri {
+        node = ${documentNode}
+        @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
+    }
+
+    flashMessages = Networkteam.Neos.FrontendLogin:FlashMessages
+    hasError = ${request.httpRequest.arguments['error']}
+    labels = Neos.Fusion:RawArray {
+        username = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.loginform.username'
+        }
+        password = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.loginform.password'
+        }
+        submit = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.loginform.submit'
+        }
+    }
+
+    @cache {
+        mode = 'uncached'
+        context {
+            1 = 'node'
+            2 = 'documentNode'
+            3 = 'site'
+        }
+    }
+
+    renderer = ''
+}
