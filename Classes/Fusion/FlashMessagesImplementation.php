@@ -6,7 +6,7 @@ namespace Networkteam\Neos\FrontendLogin\Fusion;
  ***************************************************************/
 
 use Neos\Flow\Annotations as Flow;
-use Neos\Flow\Mvc\FlashMessageContainer;
+use Neos\Flow\Mvc\FlashMessage\FlashMessageContainer;
 use Neos\Fusion\FusionObjects\AbstractFusionObject;
 
 class FlashMessagesImplementation extends AbstractFusionObject
