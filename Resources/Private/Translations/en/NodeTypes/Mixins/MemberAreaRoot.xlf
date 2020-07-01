@@ -15,7 +15,9 @@
                 <source>Login form page</source>
             </trans-unit>
             <trans-unit id="properties.loginFormPage.ui.help.message" xml:space="preserve">
-                <source>Page containing login form</source>
+                <source>Page containing login form.
+
+If you leave this property empty, the first accessible page of the current page tree level is used.</source>
             </trans-unit>
             <trans-unit id="properties._accessRoles" xml:space="preserve">
                 <source>Access roles</source>
