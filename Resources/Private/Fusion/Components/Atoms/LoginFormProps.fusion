@@ -5,18 +5,9 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atom.LoginFormProps) < proto
         action = 'authenticate'
     }
 
-    redirectAfterLoginUri = Neos.Fusion:Case {
-        refererIsSetAndValid {
-            condition = ${request.httpRequest.arguments['referer'] && Networkteam.Neos.FrontendLogin.Hash.validate(request.httpRequest.arguments['referer'])}
-            renderer = ${request.httpRequest.arguments['referer']}
-        }
-        default {
-            condition = ${true}
-            renderer = Neos.Neos:NodeUri {
-                node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogin')}
-                @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
-            }
-        }
+    redirectAfterLoginUri = Neos.Neos:NodeUri {
+        node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogin')}
+        @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
     }
 
     redirectOnErrorUri = Neos.Neos:NodeUri {
