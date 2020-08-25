@@ -45,3 +45,6 @@ Networkteam:
     FrontendLogin:
       redirectOnLoginLogoutExceptionUri: '/'
       authenticationProviderName: 'Networkteam.Neos.FrontendLogin:Frontend'
+      # role identifier to memberAreaNodeType mapping
+      roleToMemberAreaMapping:
+        'Networkteam.Neos.FrontendLogin:FrontendUser': 'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot'

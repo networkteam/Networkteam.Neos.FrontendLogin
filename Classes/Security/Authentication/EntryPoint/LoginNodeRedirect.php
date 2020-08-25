@@ -15,10 +15,21 @@ use Neos\Flow\Http\Response;
 use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\Mvc\Controller\Arguments;
 use Neos\Flow\Mvc\Controller\ControllerContext;
+use Neos\Flow\Security\Account;
 use Neos\Flow\Security\Authentication\EntryPoint\WebRedirect;
 use Neos\Flow\Security\Cryptography\HashService;
+use Neos\Neos\Domain\Service\ContentContext;
 use Networkteam\Neos\FrontendLogin\Service\NodeAccessService;
 
+/**
+ * Find document node containing login form and redirect there.
+ * There are two cases when this entry point is activated:
+ *
+ * 1. Having a authenticated user which does not have access to requested node
+ * 2. The requested node requires an authenticated user with certain access role
+ *
+ * @package Networkteam\Neos\FrontendLogin\Security\Authentication\EntryPoint
+ */
 class LoginNodeRedirect extends WebRedirect
 {
 
@@ -41,70 +52,30 @@ class LoginNodeRedirect extends WebRedirect
     protected $linkingService;
 
     /**
-     * @var HashService
-     * @Flow\Inject
+     * @Flow\InjectConfiguration(path="authenticationProviderName")
+     * @var string
      */
-    protected $hashService;
+    protected $authenticationProviderName;
+
+    /**
+     * @Flow\InjectConfiguration(path="roleToMemberAreaMapping")
+     * @var array
+     */
+    protected $roleToMemberAreaMapping;
 
     public function startAuthentication(Request $request, Response $response)
     {
-        // initialize uriBuilder
-        $actionRequest = new ActionRequest($request);
-        $this->uriBuilder->setRequest($actionRequest);
-
-
-        // is authenticated
-
-        //TODO:
-
-
-        // is NOT authenticated
-
-        // TODO: find memberAreaNode starting at original requested node
-        // get configured login page from memberAreaNode
         $originalRequest = $this->securityContext->getInterceptedRequest();
 
         if ($originalRequest->hasArgument('node')) {
             $contextPath = $originalRequest->getArgument('node');
-            $nodePathAndContext = NodePaths::explodeContextPath($contextPath);
-            $nodePath = $nodePathAndContext['nodePath'];
-            $workspaceName = $nodePathAndContext['workspaceName'];
-            $dimensions = $nodePathAndContext['dimensions'];
-            $contentContext = $this->contextFactory->create($this->prepareContextProperties($workspaceName, $dimensions));
-            $memberAreaRootNode = null;
-            $requestedNode = null;
-
-            // try to find node by disabling authorization checks (CSRF token, policies, content security, ...)
-            $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext, &$memberAreaRootNode, &$requestedNode) {
-                try {
-                    $requestedNode = $contentContext->getNode($nodePath);
-                } catch (\Exception $e) {
-                }
-
-                if ($requestedNode instanceof NodeInterface) {
-                    if ($requestedNode->getNodeType()->isOfType(NodeAccessService::MEMBERAREAROOT_NODETYPE_NAME)) {
-                        $memberAreaRootNode = $requestedNode;
-                    } else {
-                        $q = new FlowQuery([$requestedNode]);
-                        $memberAreaRootNode = $q->parents('[instanceof ' . NodeAccessService::MEMBERAREAROOT_NODETYPE_NAME . ']')->get(0);
-                    }
-                }
-            });
+            $memberAreaRootNode = $this->getMemberAreaRootNodeForAccount($contextPath, $this->getAccount());
 
             if ($memberAreaRootNode instanceof NodeInterface) {
                 try {
                     $loginFormPage = $memberAreaRootNode->getProperty('loginFormPage');
                     if ($loginFormPage instanceof NodeInterface) {
-                        $arguments = [];
-
-                        //TODO: must not be done because the original request is saved in security context which can be used in authentication controller
-//                        if ($requestedNode instanceof NodeInterface) {
-//                            $requestedNodeUri = $this->getUrlToNode($requestedNode);
-//                            $referer = $this->hashService->appendHmac($requestedNodeUri);
-//                            $arguments['referer'] = $referer;
-//                        }
-
-                        $uri = $this->getUrlToNode($loginFormPage, $arguments);
+                        $uri = $this->createNodeUri($request, $loginFormPage);
                         $response->setContent(sprintf('<html><head><meta http-equiv="refresh" content="0;url=%s"/></head></html>', htmlentities($uri, ENT_QUOTES, 'utf-8')));
                         $response->withStatus(303);
                         $response->withHeader('Location', $uri);
@@ -113,25 +84,7 @@ class LoginNodeRedirect extends WebRedirect
 
                 }
             }
-
-        } else {
-            // TODO: ?
         }
-    }
-
-    protected function prepareContextProperties($workspaceName, array $dimensions = null): array
-    {
-        $contextProperties = array(
-            'workspaceName' => $workspaceName,
-            'invisibleContentShown' => false,
-            'inaccessibleContentShown' => true
-        );
-
-        if ($dimensions !== null) {
-            $contextProperties['dimensions'] = $dimensions;
-        }
-
-        return $contextProperties;
     }
 
     /**
@@ -139,15 +92,21 @@ class LoginNodeRedirect extends WebRedirect
      *
      * @throws \Neos\Neos\Exception
      */
-    protected function getUrlToNode(NodeInterface $node, array $arguments = []): string
+    protected function createNodeUri(Request $request, NodeInterface $node, array $arguments = []): string
     {
+        // initialize uriBuilder
+        $actionRequest = new ActionRequest($request);
+        $this->uriBuilder->setRequest($actionRequest);
+
+        $controllerContext = new ControllerContext(
+            $this->uriBuilder->getRequest(),
+            new Response(),
+            new Arguments([]),
+            $this->uriBuilder
+        );
+
         return $this->linkingService->createNodeUri(
-            new ControllerContext(
-                $this->uriBuilder->getRequest(),
-                new Response(),
-                new Arguments([]),
-                $this->uriBuilder
-            ),
+            $controllerContext,
             $node,
             $node->getContext()->getRootNode(),
             'html',
@@ -156,4 +115,80 @@ class LoginNodeRedirect extends WebRedirect
         );
     }
 
+    protected function getMemberAreaRootNodeForAccount($contextPath, ?Account $account = null): ?NodeInterface
+    {
+        $memberAreaRootNode = null;
+        $nodePathAndContext = NodePaths::explodeContextPath($contextPath);
+        $nodePath = $nodePathAndContext['nodePath'];
+        $contentContext = $this->createContext($nodePathAndContext['workspaceName'], $nodePathAndContext['dimensions']);
+        $isAuthenticated = $account instanceof Account;
+
+        if ($isAuthenticated) {
+            // find MemberAreaRoot node authenticated user can access
+            $memberAreaRootNodeType = $this->getMemberAreaNodeTypeForAccount($account);
+            if ($memberAreaRootNodeType) {
+                $q = new FlowQuery([$contentContext->getCurrentSiteNode()]);
+                $memberAreaRootNode = $q->find(sprintf('[instanceof %s]', $memberAreaRootNodeType))->get(0);
+            }
+        } else {
+            // find node by disabling authorization checks (CSRF token, policies, content security, ...)
+            $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext, &$memberAreaRootNode) {
+                try {
+                    $requestedNode = $contentContext->getNode($nodePath);
+                    if ($requestedNode instanceof NodeInterface) {
+                        // find closest MemberAreaRoot node starting from requested node an traversing all parents
+                        $q = new FlowQuery([$requestedNode]);
+                        $memberAreaRootNode = $q->closest(sprintf('[instanceof %s]', NodeAccessService::MEMBERAREAROOT_NODETYPE_NAME))->get(0);
+                    }
+                } catch (\Exception $e) {
+                }
+            });
+        }
+
+        return $memberAreaRootNode;
+    }
+
+    protected function createContext($workspaceName, array $dimensions = null): ContentContext
+    {
+        $contextConfiguration = array(
+            'workspaceName' => $workspaceName,
+            'invisibleContentShown' => false,
+            'inaccessibleContentShown' => true
+        );
+
+        if ($dimensions !== null) {
+            $contextConfiguration['dimensions'] = $dimensions;
+        }
+
+        return $this->contextFactory->create($contextConfiguration);
+    }
+
+    protected function getMemberAreaNodeTypeForAccount(Account $account): ?string
+    {
+        $memberAreaRootNodeType = null;
+        /** @var \Neos\Flow\Security\Policy\Role $role */
+        foreach ($account->getRoles() as $role) {
+            if (!empty($this->roleToMemberAreaMapping[$role->getIdentifier()])) {
+                $memberAreaRootNodeType = $this->roleToMemberAreaMapping[$role->getIdentifier()];
+                break;
+            }
+        }
+        return $memberAreaRootNodeType;
+    }
+
+    /**
+     * Return authenticated FrontendLogin account
+     *
+     * @return Account|null
+     */
+    public function getAccount(): ?Account
+    {
+        if ($this->securityContext->canBeInitialized() === true) {
+            $account = $this->securityContext->getAccountByAuthenticationProviderName($this->authenticationProviderName);
+
+            return $account;
+        }
+
+        return null;
+    }
 }
