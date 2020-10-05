@@ -9,18 +9,13 @@ use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\ContentRepository\Domain\Utility\NodePaths;
-use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Error\Messages\Error;
 use Neos\Flow\AOP\JoinPointInterface;
 use Neos\Flow\Configuration\ConfigurationManager;
 use Neos\Flow\Http\Request;
-use Neos\Flow\Http\Response;
 use Neos\Flow\Mvc\ActionRequest;
-use Neos\Flow\Mvc\Controller\Arguments;
-use Neos\Flow\Mvc\Controller\ControllerContext;
 use Neos\Flow\Mvc\Routing\UriBuilder;
-use Neos\Flow\Security\Cryptography\HashService;
-use Networkteam\Neos\FrontendLogin\Service\NodeAccessService;
+use Neos\Flow\Security\Exception\AuthenticationRequiredException;
 
 /**
  * @Flow\Aspect
@@ -40,21 +35,9 @@ class NodeConverterAspect
     protected $securityContext;
 
     /**
-     * @Flow\Inject
-     * @var \Neos\Neos\Service\LinkingService
-     */
-    protected $linkingService;
-
-    /**
      * @var UriBuilder
      */
     protected $uriBuilder;
-
-    /**
-     * @var HashService
-     * @Flow\Inject
-     */
-    protected $hashService;
 
     /**
      * The injection of the faked UriBuilder is necessary to generate frontend URLs from the backend
@@ -73,12 +56,13 @@ class NodeConverterAspect
     }
 
     /**
-     * Try to find page with login form and redirect to it.
+     * Check requested node for required authentication and throw AuthenticationRequiredException
      *
      * @Flow\After("method(Neos\ContentRepository\TypeConverter\NodeConverter->convertFrom())")
      * @param JoinPointInterface $joinPoint
+     * @see https://flowframework.readthedocs.io/en/5.3/TheDefinitiveGuide/PartIII/Security.html?highlight=entrypoint#authentication-entry-points
      */
-    public function redirectToLoginPage(JoinPointInterface $joinPoint)
+    public function checkForRequiredAuthentication(JoinPointInterface $joinPoint)
     {
         $result = $joinPoint->getResult();
 
@@ -96,74 +80,25 @@ class NodeConverterAspect
             $workspaceName = $nodePathAndContext['workspaceName'];
             $dimensions = $nodePathAndContext['dimensions'];
             $contentContext = $this->contextFactory->create($this->prepareContextProperties($workspaceName, $dimensions));
-            $memberAreaRootNode = null;
-            $requestedNode = null;
 
             // try to find node by disabling authorization checks (CSRF token, policies, content security, ...)
-            $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext, &$memberAreaRootNode, &$requestedNode) {
+            $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext) {
                 try {
                     $requestedNode = $contentContext->getNode($nodePath);
                 } catch (\Exception $e) {
-
+                    // Node could not be found. Exception is caught so this aspect does not change workflow.
+                    $requestedNode = null;
                 }
 
-                if ($requestedNode instanceof NodeInterface) {
-                    if ($requestedNode->getNodeType()->isOfType(NodeAccessService::MEMBERAREAROOT_NODETYPE_NAME)) {
-                        $memberAreaRootNode = $requestedNode;
-                    } else {
-                        $q = new FlowQuery([$requestedNode]);
-                        $memberAreaRootNode = $q->parents('[instanceof ' . NodeAccessService::MEMBERAREAROOT_NODETYPE_NAME . ']')->get(0);
-                    }
+                // throw AuthenticationRequiredException so that configured EntryPoint can take action
+                if ($requestedNode instanceof NodeInterface && $requestedNode->hasAccessRestrictions() && !$requestedNode->isAccessible()) {
+                    throw new AuthenticationRequiredException('Requested node is available but has access restrictions.', 1598341784);
                 }
             });
-
-            if ($memberAreaRootNode instanceof NodeInterface) {
-                try {
-                    $loginFormPage = $memberAreaRootNode->getProperty('loginFormPage');
-                    if ($loginFormPage instanceof NodeInterface) {
-                        $arguments = [];
-                        if ($requestedNode instanceof NodeInterface) {
-                            $requestedNodeUri = $this->getUrlToNode($requestedNode);
-                            $referer = $this->hashService->appendHmac($requestedNodeUri);
-                            $arguments['referer'] = $referer;
-                        }
-                        $url = $this->getUrlToNode($loginFormPage, $arguments);
-
-                        // TODO: handle redirect correctly with status code etc.
-                        header(sprintf('Location: %s', $url));
-                        exit;
-                    }
-                } catch (\Exception $e) {
-
-                }
-            }
         }
     }
 
-    /**
-     * Create the frontend URL to a node
-     *
-     * @throws \Neos\Neos\Exception
-     */
-    protected function getUrlToNode(NodeInterface $node, array $arguments = []): string
-    {
-        $uri = $this->linkingService->createNodeUri(
-            new ControllerContext(
-                $this->uriBuilder->getRequest(),
-                new Response(),
-                new Arguments([]),
-                $this->uriBuilder
-            ),
-            $node,
-            $node->getContext()->getRootNode(),
-            'html',
-            true,
-            $arguments
-        );
-        return $uri;
-    }
-
-    protected function prepareContextProperties($workspaceName, array $dimensions = null): array
+    protected function prepareContextProperties(string $workspaceName, array $dimensions = null): array
     {
         $contextProperties = array(
             'workspaceName' => $workspaceName,

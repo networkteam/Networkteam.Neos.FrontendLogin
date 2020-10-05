@@ -19,8 +19,12 @@
                 <target>Loginformular Seite</target>
             </trans-unit>
             <trans-unit id="properties.loginFormPage.ui.help.message" xml:space="preserve">
-                <source>Page containing login form</source>
-                <target>Seite die das Loginformular enthält</target>
+                <source>Page containing login form.
+
+If you leave this property empty, the first accessible page of the current page tree level is used.</source>
+                <target>Seite die das Loginformular enthält
+
+Wenn Sie diese Eigenschaft leer lassen, wird die erste zugängliche Seite der aktuellen Seitenbaumebene verwendet.</target>
             </trans-unit>
             <trans-unit id="properties._accessRoles" xml:space="preserve">
                 <source>Access roles</source>

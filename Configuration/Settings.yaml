@@ -9,6 +9,7 @@ Neos:
                 pattern: Networkteam\Neos\FrontendLogin\Security\NeosRequestPattern
           'Networkteam.Neos.FrontendLogin:Frontend':
             provider: PersistedUsernamePasswordProvider
+            entryPoint: Networkteam\Neos\FrontendLogin\Security\Authentication\EntryPoint\LoginNodeRedirect
             requestPatterns:
               'Networkteam.Neos.FrontendLogin:NeosFrontend':
                 pattern: Networkteam\Neos\FrontendLogin\Security\NeosRequestPattern
@@ -44,3 +45,6 @@ Networkteam:
     FrontendLogin:
       redirectOnLoginLogoutExceptionUri: '/'
       authenticationProviderName: 'Networkteam.Neos.FrontendLogin:Frontend'
+      # role identifier to memberAreaNodeType mapping
+      roleToMemberAreaMapping:
+        'Networkteam.Neos.FrontendLogin:FrontendUser': 'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot'

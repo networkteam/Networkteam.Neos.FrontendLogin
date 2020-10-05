@@ -56,6 +56,11 @@ class AuthenticationController extends AbstractAuthenticationController
      */
     protected function onAuthenticationSuccess(ActionRequest $originalRequest = null)
     {
+        if ($originalRequest !== null) {
+            // Redirect to the location that redirected to the login form because the user was nog logged in
+            $this->redirectToRequest($originalRequest);
+        }
+
         try {
             $redirectAfterLoginUri = $this->hashService->validateAndStripHmac(
                 $this->request->getArgument('redirectAfterLoginUri')
