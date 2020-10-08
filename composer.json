@@ -12,7 +12,7 @@
         }
     ],
     "require": {
-        "neos/neos": "~4.0",
+        "neos/neos": "~4.5",
         "neos/fusion-afx": "*"
     },
     "autoload": {
@@ -21,6 +21,9 @@
         }
     },
     "extra": {
+        "branch-alias": {
+            "dev-main": "master"
+        },
         "neos": {
             "package-key": "Networkteam.Neos.FrontendLogin"
         }
