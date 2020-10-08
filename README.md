@@ -11,13 +11,6 @@ It provides a mixin for MemberAreaRootPages. The package makes use of the `acces
   After successful login you will be redirected to initially requested page (referer).
 * Multiple member areas with different access roles are possible
 
-## NodeTypes
-
-**Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot**
-
-The mixin `Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot` defines the root point of a specific
-member area and is of type `Neos.NodeTypes:Page`
-
 ## Installation
 
 Install the package via composer
@@ -25,6 +18,20 @@ Install the package via composer
 ```bash
 composer require networkteam/neos-frontendlogin
 ```
+
+Campatibility with `neos/neos` Package
+
+| Neos.Neos | Networkteam.Neos.FrontendLogin |
+|-----------|--------------------------------|
+| `4.x`     | `1.x`                          |
+| `5.x`     | `main` branch                  |
+
+## NodeTypes
+
+**Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot**
+
+The mixin `Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot` defines the root point of a specific
+member area and is of type `Neos.NodeTypes:Page`
 
 ## Authentication via roles
 
