@@ -22,7 +22,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "master"
+            "dev-main": "master-dev"
         },
         "neos": {
             "package-key": "Networkteam.Neos.FrontendLogin"
