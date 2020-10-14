@@ -6,7 +6,13 @@ namespace Networkteam\Neos\FrontendLogin\Controller;
  ***************************************************************/
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Http\Helper\UriHelper;
+use Neos\Flow\Http\Uri;
+use Neos\Flow\I18n\Locale;
+use Neos\Flow\I18n\Service;
 use Neos\Flow\Mvc\ActionRequest;
+use Neos\Flow\Mvc\Exception\NoSuchArgumentException;
+use Neos\Flow\Mvc\RequestInterface;
 use Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController;
 use Neos\Flow\Security\Cryptography\HashService;
 use Neos\Flow\Security\Exception\AuthenticationRequiredException;
@@ -14,6 +20,13 @@ use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelper;
 
 class AuthenticationController extends AbstractAuthenticationController
 {
+
+    /**
+     * @Flow\Inject
+     * @var Service
+     */
+    protected $i18nService;
+
     /**
      * @Flow\Inject
      * @var FlashMessageHelper
@@ -31,6 +44,19 @@ class AuthenticationController extends AbstractAuthenticationController
      * @Flow\Inject
      */
     protected $hashService;
+
+    public function initializeAction()
+    {
+        parent::initializeAction();
+
+        try {
+            $localeIdentifier = $this->request->getArgument('locale');
+            $currentLocale = new Locale($localeIdentifier);
+            $this->i18nService->getConfiguration()->setCurrentLocale($currentLocale);
+        } catch (NoSuchArgumentException $e) {
+
+        }
+    }
 
     /**
      * @Flow\SkipCsrfProtection
@@ -83,21 +109,20 @@ class AuthenticationController extends AbstractAuthenticationController
         $this->flashMessageHelper->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
 
         try {
-            $redirectUriString = $this->hashService->validateAndStripHmac(
-                $this->request->getArgument('redirectOnErrorUri')
-            );
-
-            $redirectUri = new \Neos\Flow\Http\Uri($redirectUriString);
-            $redirectUriWithErrorParameter = \Neos\Flow\Http\Helper\UriHelper::uriWithArguments(
-                $redirectUri,
-                [
-                    'error' => 'authenticationFailed'
-                ]
-            );
-
+            $redirectUriWithErrorParameter = $this->getRedirectOnErrorUri($this->request);
             $this->redirectToUri($redirectUriWithErrorParameter);
         } catch (\Neos\Flow\Security\Exception $e) {
 
+        }
+    }
+
+    protected function validateHmac(string $string): bool
+    {
+        try {
+            $this->hashService->validateAndStripHmac($string);
+            return true;
+        } catch (\Exception $e) {
+            return false;
         }
     }
 
@@ -109,5 +134,24 @@ class AuthenticationController extends AbstractAuthenticationController
     protected function getErrorFlashMessage()
     {
         return false;
+    }
+
+    protected function getRedirectOnErrorUri(RequestInterface $request): \Psr\Http\Message\UriInterface
+    {
+        $redirectOnErrorUriString = $this->hashService->validateAndStripHmac(
+            $request->getArgument('redirectOnErrorUri')
+        );
+
+        $redirectUri = new Uri($redirectOnErrorUriString);
+        $arguments = [
+            'error' => 'authenticationFailed'
+        ];
+
+        // validate redirectAfterLoginUri request argument and add it to redirectOnErrorUri arguments
+        if ($this->validateHmac($this->request->getArgument('redirectAfterLoginUri'))) {
+            $arguments['redirectAfterLoginUri'] = $request->getArgument('redirectAfterLoginUri');
+        }
+
+        return UriHelper::uriWithArguments($redirectUri, $arguments);
     }
 }

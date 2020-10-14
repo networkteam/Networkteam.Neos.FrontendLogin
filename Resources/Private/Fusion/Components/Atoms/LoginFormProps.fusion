@@ -3,6 +3,9 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atom.LoginFormProps) < proto
         package = 'Networkteam.Neos.FrontendLogin'
         controller = 'Authentication'
         action = 'authenticate'
+        arguments = Neos.Fusion:DataStructure {
+            locale = ${Networkteam.Neos.FrontendLogin.Locale.current()}
+        }
     }
 
     redirectAfterLoginUri = Neos.Neos:NodeUri {
