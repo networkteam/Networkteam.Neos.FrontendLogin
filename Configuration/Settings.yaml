@@ -39,6 +39,7 @@ Neos:
     defaultContext:
       Networkteam.Neos.FrontendLogin.Hash: \Networkteam\Neos\FrontendLogin\Eel\HashHelper
       Networkteam.Neos.FrontendLogin.User: \Networkteam\Neos\FrontendLogin\Eel\UserHelper
+      Networkteam.Neos.FrontendLogin.Locale: \Networkteam\Neos\FrontendLogin\Eel\LocaleHelper
 
 Networkteam:
   Neos:
