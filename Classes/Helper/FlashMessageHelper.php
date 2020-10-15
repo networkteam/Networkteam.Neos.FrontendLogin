@@ -30,7 +30,7 @@ class FlashMessageHelper
     protected function getTranslation(string $id, array $arguments = []): string
     {
         $translationHelper = new TranslationHelper();
-        $translationHelper->translate(
+        return $translationHelper->translate(
             $id,
             null,
             $arguments,
