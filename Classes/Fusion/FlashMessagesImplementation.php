@@ -6,7 +6,8 @@ namespace Networkteam\Neos\FrontendLogin\Fusion;
  ***************************************************************/
 
 use Neos\Flow\Annotations as Flow;
-use Neos\Flow\Mvc\FlashMessage\FlashMessageContainer;
+use Neos\Flow\Mvc\ActionRequest;
+use Neos\Flow\Mvc\FlashMessage\FlashMessageService;
 use Neos\Fusion\FusionObjects\AbstractFusionObject;
 
 class FlashMessagesImplementation extends AbstractFusionObject
@@ -14,24 +15,29 @@ class FlashMessagesImplementation extends AbstractFusionObject
 
     /**
      * @Flow\Inject
-     * @var FlashMessageContainer
+     * @var FlashMessageService
      */
-    protected $flashMessageContainer;
+    protected $flashMessageService;
 
     /**
      * @return array
-     *
      */
     public function evaluate()
     {
         $severity = $this->getSeverity();
-        $flashMessages = $this->flashMessageContainer->getMessagesAndFlush($severity);
+        $actionRequest = ActionRequest::fromHttpRequest($this->getHttpRequest());
+        $flashMessageContainer = $this->flashMessageService->getFlashMessageContainerForRequest($actionRequest);
 
-        return $flashMessages;
+        return $flashMessageContainer->getMessagesAndFlush($severity);
     }
 
     public function getSeverity(): ?string
     {
         return $this->fusionValue('severity');
+    }
+
+    public function getHttpRequest()
+    {
+        return $this->fusionValue('httpRequest');
     }
 }

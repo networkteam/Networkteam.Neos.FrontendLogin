@@ -5,9 +5,9 @@ namespace Networkteam\Neos\FrontendLogin\Controller;
  *  (c) 2019 networkteam GmbH - all rights reserved
  ***************************************************************/
 
+use GuzzleHttp\Psr7\Uri;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Http\Helper\UriHelper;
-use Neos\Flow\Http\Uri;
 use Neos\Flow\I18n\Locale;
 use Neos\Flow\I18n\Service;
 use Neos\Flow\Mvc\ActionRequest;
@@ -17,6 +17,7 @@ use Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationControlle
 use Neos\Flow\Security\Cryptography\HashService;
 use Neos\Flow\Security\Exception\AuthenticationRequiredException;
 use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelper;
+use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelperFactory;
 
 class AuthenticationController extends AbstractAuthenticationController
 {
@@ -26,12 +27,6 @@ class AuthenticationController extends AbstractAuthenticationController
      * @var Service
      */
     protected $i18nService;
-
-    /**
-     * @Flow\Inject
-     * @var FlashMessageHelper
-     */
-    protected $flashMessageHelper;
 
     /**
      * @Flow\InjectConfiguration(package="Networkteam.Neos.FrontendLogin", path="redirectOnLoginLogoutExceptionUri")
@@ -106,7 +101,7 @@ class AuthenticationController extends AbstractAuthenticationController
      */
     protected function onAuthenticationFailure(AuthenticationRequiredException $exception = null)
     {
-        $this->flashMessageHelper->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
+        $this->getFlashMessageHelper()->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
 
         try {
             $redirectUriWithErrorParameter = $this->getRedirectOnErrorUri($this->request);
@@ -153,5 +148,10 @@ class AuthenticationController extends AbstractAuthenticationController
         }
 
         return UriHelper::uriWithArguments($redirectUri, $arguments);
+    }
+
+    protected function getFlashMessageHelper(): FlashMessageHelper
+    {
+        return FlashMessageHelperFactory::create($this->request);
     }
 }

@@ -1,4 +1,4 @@
-prototype(Networkteam.Neos.FrontendLogin:Components.Atom.LoginForm) < prototype(Networkteam.Neos.FrontendLogin:Components.Atom.LoginFormProps) {
+prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm) < prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginFormProps) {
     renderer = afx`
         <div>
             <div class="flash-messages" @if.hasFlashMessages={props.flashMessages}>

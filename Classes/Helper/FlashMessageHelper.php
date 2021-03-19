@@ -8,15 +8,27 @@ namespace Networkteam\Neos\FrontendLogin\Helper;
 use Neos\Error\Messages\Error;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\I18n\EelHelper\TranslationHelper;
-use Neos\Flow\Mvc\FlashMessage\FlashMessageContainer;
+use Neos\Flow\Mvc\ActionRequest;
+use Neos\Flow\Mvc\FlashMessage\FlashMessageService;
 
 class FlashMessageHelper
 {
+
     /**
-     * @Flow\Inject
-     * @var FlashMessageContainer
+     * @var ActionRequest
      */
-    protected $flashMessageContainer;
+    protected $request;
+
+    /**
+     * @var FlashMessageService
+     * @Flow\Inject
+     */
+    protected $flashMessageService;
+
+    public function __construct($request)
+    {
+        $this->request = $request;
+    }
 
     public function addErrorMessage(string $labelId, int $code, array $labelArguments = []): void
     {
@@ -24,7 +36,7 @@ class FlashMessageHelper
         $title = $this->getTranslation(sprintf('%s.title', $labelId), $labelArguments);
         $error = new Error($message, $code, [], $title);
 
-        $this->flashMessageContainer->addMessage($error);
+        $this->flashMessageService->getFlashMessageContainerForRequest($this->request)->addMessage($error);
     }
 
     protected function getTranslation(string $id, array $arguments = []): string
@@ -38,4 +50,5 @@ class FlashMessageHelper
             'Networkteam.Neos.FrontendLogin'
         );
     }
+
 }

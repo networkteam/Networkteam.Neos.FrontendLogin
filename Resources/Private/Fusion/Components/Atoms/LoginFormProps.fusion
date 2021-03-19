@@ -1,4 +1,4 @@
-prototype(Networkteam.Neos.FrontendLogin:Components.Atom.LoginFormProps) < prototype(Neos.Neos:ContentComponent) {
+prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginFormProps) < prototype(Neos.Neos:ContentComponent) {
     actionUri = Neos.Fusion:UriBuilder {
         package = 'Networkteam.Neos.FrontendLogin'
         controller = 'Authentication'

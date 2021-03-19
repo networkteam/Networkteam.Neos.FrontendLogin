@@ -1,21 +1,23 @@
-prototype(Networkteam.Neos.FrontendLogin:LoginHandler) < prototype(Neos.Fusion:Case) {
-    inBackend {
-        label = Networkteam.Neos.FrontendLogin:TranslatedValue {
-            id = 'loginhandler.inbackend'
+prototype(Networkteam.Neos.FrontendLogin:LoginHandler) < prototype(Neos.Fusion:Component) {
+    renderer = Neos.Fusion:Case {
+        inBackend {
+            label = Networkteam.Neos.FrontendLogin:TranslatedValue {
+                id = 'loginhandler.inbackend'
+            }
+            condition = ${node.context.inBackend}
+            renderer = ${'<p>' + this.label + '</p>'}
         }
-        condition = ${node.context.inBackend}
-        renderer = ${'<p>' + this.label + '</p>'}
-    }
 
-    showAccount {
-        condition = ${Security.hasRole('Networkteam.Neos.FrontendLogin:MemberArea')}
-        renderer = Networkteam.Neos.FrontendLogin:Components.Atoms.Account
-    }
+        showAccount {
+            condition = ${Security.hasRole('Networkteam.Neos.FrontendLogin:MemberArea')}
+            renderer = Networkteam.Neos.FrontendLogin:Components.Atoms.Account
+        }
 
-    showLoginForm {
-        condition = ${true}
-        renderer = Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm {
-            flashMessages = Networkteam.Neos.FrontendLogin:FlashMessages
+        showLoginForm {
+            condition = ${true}
+            renderer = Networkteam.Neos.FrontendLogin:Components.Atoms.LoginForm {
+                flashMessages = Networkteam.Neos.FrontendLogin:FlashMessages
+            }
         }
     }
 }
