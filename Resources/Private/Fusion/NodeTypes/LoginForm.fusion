@@ -12,5 +12,5 @@ prototype(Networkteam.Neos.FrontendLogin:LoginForm) < prototype(Neos.Neos:Conten
 
 # caching configuration
 prototype(Neos.Fusion:GlobalCacheIdentifiers) {
-    errorArgument = ${request.httpRequest.arguments.error}
+    errorArgument = ${request.arguments.error}
 }

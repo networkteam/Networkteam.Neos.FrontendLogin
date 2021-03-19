@@ -19,7 +19,7 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginFormProps) < prot
     }
 
     flashMessages = Networkteam.Neos.FrontendLogin:FlashMessages
-    hasError = ${request.httpRequest.arguments['error']}
+    hasError = ${request.arguments['error']}
     labels = Neos.Fusion:RawArray {
         username = Networkteam.Neos.FrontendLogin:TranslatedValue {
             id = 'components.atoms.loginform.username'
