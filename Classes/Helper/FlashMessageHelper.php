@@ -8,7 +8,7 @@ namespace Networkteam\Neos\FrontendLogin\Helper;
 use Neos\Error\Messages\Error;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\I18n\EelHelper\TranslationHelper;
-use Neos\Flow\Mvc\FlashMessageContainer;
+use Neos\Flow\Mvc\FlashMessage\FlashMessageContainer;
 
 class FlashMessageHelper
 {
