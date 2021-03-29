@@ -26,6 +26,14 @@
                 <source>Authentication failed!</source>
                 <target>Anmeldung fehlgeschlagen!</target>
             </trans-unit>
+            <trans-unit id="authentication.onAuthenticationFailure.redirectFailed.title" xml:space="preserve">
+                <source>Redirect failed!</source>
+                <target>Weiterleitung fehlgeschlagen!</target>
+            </trans-unit>
+            <trans-unit id="authentication.onAuthenticationFailure.redirectFailed.body" xml:space="preserve">
+                <source>Exception occurred while trying to redirect: {exceptionMessage} ({exceptionCode})</source>
+                <target>Während der Weiterleitung ist ein Fehler aufgetreten: {exceptionMessage} ({exceptionCode})</target>
+            </trans-unit>
             <trans-unit id="authentication.onAuthenticationFailure.authenticationFailed.body" xml:space="preserve">
                 <source>The login could not be performed with the given credentials.</source>
                 <target>Mit den eingegebenen Zugangsdaten konnte die Anmeldung nicht durchgeführt werden.</target>

@@ -23,6 +23,12 @@
             <trans-unit id="authentication.onAuthenticationFailure.authenticationFailed.body" xml:space="preserve">
                 <source>The login could not be performed with the given credentials.</source>
             </trans-unit>
+            <trans-unit id="authentication.onAuthenticationFailure.redirectFailed.title" xml:space="preserve">
+                <source>Redirect failed!</source>
+            </trans-unit>
+            <trans-unit id="authentication.onAuthenticationFailure.redirectFailed.body" xml:space="preserve">
+                <source>Exception occurred while trying to redirect: {exceptionMessage} ({exceptionCode})</source>
+            </trans-unit>
             <trans-unit id="loginhandler.inbackend" xml:space="preserve">
                 <source>Form is disabled in backend mode.</source>
             </trans-unit>

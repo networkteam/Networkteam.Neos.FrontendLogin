@@ -16,7 +16,10 @@ use Neos\Flow\Mvc\RequestInterface;
 use Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController;
 use Neos\Flow\Security\Cryptography\HashService;
 use Neos\Flow\Security\Exception\AuthenticationRequiredException;
+use Neos\Flow\Security\Exception\InvalidArgumentForHashGenerationException;
+use Neos\Flow\Security\Exception\InvalidHashException;
 use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelper;
+use Psr\Http\Message\UriInterface;
 
 class AuthenticationController extends AbstractAuthenticationController
 {
@@ -111,8 +114,15 @@ class AuthenticationController extends AbstractAuthenticationController
         try {
             $redirectUriWithErrorParameter = $this->getRedirectOnErrorUri($this->request);
             $this->redirectToUri($redirectUriWithErrorParameter);
-        } catch (\Neos\Flow\Security\Exception $e) {
-
+        } catch (\Exception $e) {
+            $this->flashMessageHelper->addErrorMessage(
+                'authentication.onAuthenticationFailure.redirectFailed',
+                1617020324,
+                [
+                    'exceptionMessage' => $e->getMessage(),
+                    'exceptionCode' => $e->getCode()
+                ]
+            );
         }
     }
 
@@ -136,7 +146,14 @@ class AuthenticationController extends AbstractAuthenticationController
         return false;
     }
 
-    protected function getRedirectOnErrorUri(RequestInterface $request): \Psr\Http\Message\UriInterface
+    /**
+     * @param RequestInterface $request
+     * @return UriInterface
+     * @throws NoSuchArgumentException
+     * @throws InvalidArgumentForHashGenerationException
+     * @throws InvalidHashException
+     */
+    protected function getRedirectOnErrorUri(RequestInterface $request): UriInterface
     {
         $redirectOnErrorUriString = $this->hashService->validateAndStripHmac(
             $request->getArgument('redirectOnErrorUri')
@@ -153,5 +170,14 @@ class AuthenticationController extends AbstractAuthenticationController
         }
 
         return UriHelper::uriWithArguments($redirectUri, $arguments);
+    }
+
+    protected function errorAction()
+    {
+        return sprintf(
+            '%s<br />%s',
+            parent::errorAction(),
+            implode("<br />", $this->flashMessageContainer->getMessagesAndFlush())
+        );
     }
 }
