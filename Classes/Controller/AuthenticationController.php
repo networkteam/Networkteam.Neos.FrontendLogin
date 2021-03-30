@@ -12,6 +12,7 @@ use Neos\Flow\I18n\Locale;
 use Neos\Flow\I18n\Service;
 use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\Mvc\Exception\NoSuchArgumentException;
+use Neos\Flow\Mvc\Exception\StopActionException;
 use Neos\Flow\Mvc\RequestInterface;
 use Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController;
 use Neos\Flow\Security\Cryptography\HashService;
@@ -111,10 +112,11 @@ class AuthenticationController extends AbstractAuthenticationController
     {
         $this->flashMessageHelper->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
 
+        // build and validate redirect uri
         try {
             $redirectUriWithErrorParameter = $this->getRedirectOnErrorUri($this->request);
-            $this->redirectToUri($redirectUriWithErrorParameter);
         } catch (\Exception $e) {
+            $redirectUriWithErrorParameter = false;
             $this->flashMessageHelper->addErrorMessage(
                 'authentication.onAuthenticationFailure.redirectFailed',
                 1617020324,
@@ -123,6 +125,15 @@ class AuthenticationController extends AbstractAuthenticationController
                     'exceptionCode' => $e->getCode()
                 ]
             );
+        }
+
+        // For $redirectUriWithErrorParameter being false the errorAction() should be called
+        if ($redirectUriWithErrorParameter !== false) {
+            try {
+                $this->redirectToUri($redirectUriWithErrorParameter);
+            } catch (\Neos\Flow\Security\Exception $e) {
+
+            }
         }
     }
 
