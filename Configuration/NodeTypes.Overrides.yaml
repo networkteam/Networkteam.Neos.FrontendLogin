@@ -1,4 +1,0 @@
-'Neos.NodeTypes:Page':
-  constraints:
-    nodeTypes:
-      'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot': true

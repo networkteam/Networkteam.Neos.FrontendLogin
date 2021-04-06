@@ -1,7 +1,6 @@
 'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot':
   abstract: true
   superTypes:
-    'Neos.NodeTypes:Page': true
     'Networkteam.Neos.FrontendLogin:Mixins.InspectorUi': true
   constraints:
     nodeTypes:

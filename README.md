@@ -57,7 +57,7 @@ or use the user management module inside Neos backend.
 
 ## Create member area
 
-The packages does not supply a concrete implementation. It does only supply a mixin.
+The package does not supply a concrete implementation. It does only supply a mixin.
 To create a member area you need to define a specific nodeType for MemberAreaRootPages which 
 implements the mixin provided by this package.
 
@@ -71,6 +71,7 @@ An example configuration could look as follows:
 ```yaml
 'Your.Package:MemberAreaRootPage':
   superTypes:
+    'Neos.NodeTypes:Page': true
     'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot': true
   ui:
     label: 'Member area'
@@ -83,7 +84,7 @@ For your defined nodeType you need a suitable fusion object. An example configur
 *Packages/Application/Your.Package/Resources/Private/Fusion/MemberAreaRootPage.fusion*
 ```fusion
 # MemberAreaRootPage
-prototype(Your.Package:MemberAreaRootPage) < prototype(Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot) {
+prototype(Your.Package:MemberAreaRootPage) < prototype(Neos.NodeTypes:Page) {
 
 }
 ```
@@ -94,7 +95,7 @@ Now you can log into Neos backend and create a new **MemberAreaRootPage**. Defin
 member area by selecting access roles and apply the changes.
 
 Next you need to add a **login form** on a page which is not protected. Do not place the login form within 
-your member area or the MemberAreaRootPage. Otherwise your users won't be able to access the login form.
+your member area or the MemberAreaRootPage. Otherwise, your users won't be able to access the login form.
 
 Now go back to the previously create MemberAreaRootPage and select the page containing the login form (`Login form page`).
 
