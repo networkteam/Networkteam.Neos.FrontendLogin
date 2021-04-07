@@ -7,6 +7,7 @@ namespace Networkteam\Neos\FrontendLogin\Service;
  ***************************************************************/
 
 use Neos\ContentRepository\Domain\Model\NodeInterface;
+use Neos\ContentRepository\Domain\Service\NodeService;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Flow\Annotations as Flow;
 
@@ -19,6 +20,8 @@ class NodeAccessService
 
     const DEFAULT_MEMBERAREA_ROLE_NAME = 'Networkteam.Neos.FrontendLogin:FrontendUser';
 
+    const MIXINS_ACCESSROLES_NODETYPE_NAME = 'Networkteam.Neos.FrontendLogin:Mixins.AccessRoles';
+
     protected $processedNodes = [];
 
     /**
@@ -26,6 +29,12 @@ class NodeAccessService
      * @var RoleService
      */
     protected $roleService;
+
+    /**
+     * @Flow\Inject
+     * @var NodeService
+     */
+    protected $nodeService;
 
     public function updateAccessRoles(NodeInterface $node)
     {
@@ -50,6 +59,29 @@ class NodeAccessService
         }
     }
 
+    public function updateChildrenAccessRolesProperty(NodeInterface $node, $propertyName, $oldValue, $value): void
+    {
+        $isMemberAreaRootNode = $node->getNodeType()->isOfType(self::MEMBERAREAROOT_NODETYPE_NAME);
+        $isAccessRolesProperty = $propertyName === 'accessRoles';
+
+        if ($isMemberAreaRootNode && $isAccessRolesProperty) {
+            // update internal property "_accessRoles"
+            if (is_array($value)) {
+                $this->addMemberAreaAccessRoles($node, $node);
+            }
+
+            // update access role property of all child nodes
+            $q = new FlowQuery([$node]);
+            $children = $q->children(sprintf('[instanceof %s]', NodeAccessService::MIXINS_ACCESSROLES_NODETYPE_NAME));
+
+            /** @var NodeInterface $childNode */
+            foreach ($children as $childNode) {
+                // this leads to an node update signal and execution of self::updateAccessRoles
+                $childNode->setProperty($propertyName, $value);
+            }
+        }
+    }
+
     protected function getMemberAreaRootNodeFromDocumentNode(NodeInterface $node): ?NodeInterface
     {
         if ($node->getNodeType()->isOfType(self::MEMBERAREAROOT_NODETYPE_NAME)) {
@@ -69,7 +101,7 @@ class NodeAccessService
         $accessRoles = $this->roleService->getAccessRolesForNodeWithoutMemberAreaRoles($node);
 
         if (is_array($accessRoles)) {
-            foreach ($memberAreaRootNode->getAccessRoles() as $roleIdentifier) {
+            foreach ($memberAreaRootNode->getProperty('accessRoles') as $roleIdentifier) {
                 $accessRoles[] = $roleIdentifier;
             }
 
@@ -90,5 +122,4 @@ class NodeAccessService
             return false;
         }
     }
-
 }

@@ -17,6 +17,7 @@ class Package extends \Neos\Flow\Package\Package
         $dispatcher = $bootstrap->getSignalSlotDispatcher();
         $dispatcher->connect(Node::class, 'nodeUpdated', NodeAccessService::class, 'updateAccessRoles');
         $dispatcher->connect(Node::class, 'nodePathChanged', NodeAccessService::class, 'updateAccessRoles');
+        $dispatcher->connect(Node::class, 'nodePropertyChanged', NodeAccessService::class, 'updateChildrenAccessRolesProperty');
     }
 
 }

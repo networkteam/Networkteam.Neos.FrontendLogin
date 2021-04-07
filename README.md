@@ -41,7 +41,7 @@ You can define your own frontend user roles by adding them to the `Policy.yaml` 
 MemberAreaRootPage node.
 
 When you set access roles on your MemberAreaRootPage via the inspector and apply the changes, these access roles will be set on all 
-DocumentNodes beneath that MemberAreaRootPage as well. This ensures that all theses pages can only be access by users 
+DocumentNodes beneath that MemberAreaRootPage as well. This ensures that all these pages can only be access by users 
 having one of the selected roles.
 
 ## Create Frontend Users
