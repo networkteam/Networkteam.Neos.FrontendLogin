@@ -59,15 +59,20 @@ class RoleService
      * Remove all MemberArea roles from given node and return remaining roles
      *
      * @param NodeInterface $node
-     * @return array|null Returns an array of remaining roles and null if an error occurred
+     * @return array Returns an array of remaining roles
      */
-    public function getAccessRolesForNodeWithoutMemberAreaRoles(NodeInterface $node): ?array
+    public function getAccessRolesForNodeWithoutMemberAreaRoles(NodeInterface $node): array
     {
         $accessRoles = [];
-        foreach ($node->getAccessRoles() as $roleIdentfier) {
-            if (!$this->isMemberAreaRole($roleIdentfier)) {
-                $accessRoles[] = $roleIdentfier;
+
+        try {
+            foreach ($node->getProperty('accessRoles') as $roleIdentifier) {
+                if (!$this->isMemberAreaRole($roleIdentifier)) {
+                    $accessRoles[] = $roleIdentifier;
+                }
             }
+        } catch (\Exception $e) {
+
         }
 
         return $accessRoles;
