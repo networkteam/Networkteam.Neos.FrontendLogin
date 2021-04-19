@@ -89,7 +89,7 @@ class NodeAccessService
 
             // update accessRoles property of all child nodes
             $q = new FlowQuery([$node]);
-            $children = $q->children(sprintf('[instanceof %s]', NodeAccessService::MIXINS_ACCESSROLES_NODETYPE_NAME));
+            $children = $q->find(sprintf('[instanceof %s]', NodeAccessService::MIXINS_ACCESSROLES_NODETYPE_NAME));
 
             /** @var NodeInterface $childNode */
             foreach ($children as $childNode) {
