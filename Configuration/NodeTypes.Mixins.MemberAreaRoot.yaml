@@ -1,7 +1,6 @@
 'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot':
   abstract: true
   superTypes:
-    'Neos.NodeTypes:Page': true
     'Networkteam.Neos.FrontendLogin:Mixins.InspectorUi': true
   constraints:
     nodeTypes:
@@ -14,21 +13,12 @@
     group: frontendLogin
 
   properties:
-    _accessRoles:
-      type: array
+    accessRoles:
       validation:
         'Neos.Neos/Validation/NotEmptyValidator': []
       ui:
-        label: i18n
-        help:
-          message: i18n
         inspector:
           group: 'frontendLogin'
-          editor: 'Neos.Neos/Inspector/Editors/SelectBoxEditor'
-          editorOptions:
-            placeholder: i18n
-            allowEmpty: false
-            dataSourceIdentifier: 'networkteam-neos-frontendlogin-roles'
     loginFormPage:
       type: reference
       ui:

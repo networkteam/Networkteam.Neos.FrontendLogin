@@ -26,6 +26,14 @@ Campatibility with `neos/neos` Package
 | `4.x`     | `1.x`                          |
 | `5.x`     | `main` branch                  |
 
+## Migration
+
+This package provides a node migration for copying existing internal accessRoles values to a regular node property.
+
+```bash
+./flow node:migrate 20210419111000 --confirmation true
+```
+
 ## NodeTypes
 
 **Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot**
@@ -48,7 +56,7 @@ You can define your own frontend user roles by adding them to the `Policy.yaml` 
 MemberAreaRootPage node.
 
 When you set access roles on your MemberAreaRootPage via the inspector and apply the changes, these access roles will be set on all 
-DocumentNodes beneath that MemberAreaRootPage as well. This ensures that all theses pages can only be access by users 
+DocumentNodes beneath that MemberAreaRootPage as well. This ensures that all these pages can only be access by users 
 having one of the selected roles.
 
 ## Create Frontend Users
@@ -64,7 +72,7 @@ or use the user management module inside Neos backend.
 
 ## Create member area
 
-The packages does not supply a concrete implementation. It does only supply a mixin.
+The package does not supply a concrete implementation. It does only supply a mixin.
 To create a member area you need to define a specific nodeType for MemberAreaRootPages which 
 implements the mixin provided by this package.
 
@@ -101,7 +109,7 @@ Now you can log into Neos backend and create a new **MemberAreaRootPage**. Defin
 member area by selecting access roles and apply the changes.
 
 Next you need to add a **login form** on a page which is not protected. Do not place the login form within 
-your member area or the MemberAreaRootPage. Otherwise your users won't be able to access the login form.
+your member area or the MemberAreaRootPage. Otherwise, your users won't be able to access the login form.
 
 Now go back to the previously create MemberAreaRootPage and select the page containing the login form (`Login form page`).
 

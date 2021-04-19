@@ -1,4 +1,3 @@
-'Neos.NodeTypes:Page':
-  constraints:
-    nodeTypes:
-      'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot': true
+'Neos.Neos:Document':
+  superTypes:
+    'Networkteam.Neos.FrontendLogin:Mixins.AccessRoles': true

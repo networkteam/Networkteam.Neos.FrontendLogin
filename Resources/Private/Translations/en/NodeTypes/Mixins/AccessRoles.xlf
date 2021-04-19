@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file original="" product-name="Networkteam.Neos.FrontendLogin" source-language="en" datatype="plaintext">
+        <body>
+            <trans-unit id="properties.accessRoles" xml:space="preserve">
+                <source>Access roles</source>
+            </trans-unit>
+            <trans-unit id="properties.accessRoles.ui.help.message" xml:space="preserve">
+                <source>The assigend roles apply for this page and all it's children. That means only frontend users having one of the applied roles are able to see the pages.</source>
+            </trans-unit>
+            <trans-unit id="properties.accessRoles.selectBoxEditor.placeholder" xml:space="preserve">
+                <source>Please select at least one role</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
