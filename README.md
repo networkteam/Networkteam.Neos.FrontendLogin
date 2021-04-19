@@ -26,6 +26,14 @@ Campatibility with `neos/neos` Package
 | `4.x`     | `1.x`                          |
 | `5.x`     | `main` branch                  |
 
+## Migration
+
+This package provides a node migration for copying existing internal accessRoles values to a regular node property.
+
+```bash
+./flow node:migrate 20210419111000 --confirmation true
+```
+
 ## NodeTypes
 
 **Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot**
