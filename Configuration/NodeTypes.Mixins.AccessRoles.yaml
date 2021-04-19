@@ -9,7 +9,7 @@
         help:
           message: i18n
         inspector:
-          group: 'frontendLogin'
+          group: ~
           editor: 'Neos.Neos/Inspector/Editors/SelectBoxEditor'
           editorOptions:
             placeholder: i18n
