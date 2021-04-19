@@ -26,6 +26,14 @@ Install the package via composer
 composer require networkteam/neos-frontendlogin
 ```
 
+## Migration
+
+This package provides a node migration for copying existing internal accessRoles values to a regular node property.
+
+```bash
+./flow node:migrate 20210419111000 --confirmation true
+```
+
 ## Authentication via roles
 
 This packages makes use of the neos flow security framework. For further details you can have a look into the
