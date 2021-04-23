@@ -2,4 +2,5 @@ prototype(Networkteam.Neos.FrontendLogin:FlashMessages) {
     @class = 'Networkteam\\Neos\\FrontendLogin\\Fusion\\FlashMessagesImplementation'
 
     severity = null
+    httpRequest = ${request.httpRequest}
 }

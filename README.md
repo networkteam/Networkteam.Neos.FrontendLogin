@@ -52,7 +52,7 @@ Two role definitions are provided:
 * **Networkteam.Neos.FrontendLogin:FrontendUser**: Concrete access role implementation
 
 You can define your own frontend user roles by adding them to the `Policy.yaml` of your package. Make sure that you add 
-`Networkteam.Neos.FrontendLogin:MemberArea` as parent role. Otherwise you won't be available to select the role within 
+`Networkteam.Neos.FrontendLogin:MemberArea` as parent role. Otherwise, you won't be able to select the role within 
 MemberAreaRootPage node.
 
 When you set access roles on your MemberAreaRootPage via the inspector and apply the changes, these access roles will be set on all 
@@ -86,6 +86,7 @@ An example configuration could look as follows:
 ```yaml
 'Your.Package:MemberAreaRootPage':
   superTypes:
+    'Neos.Neos:Document': true
     'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot': true
   ui:
     label: 'Member area'
@@ -98,10 +99,12 @@ For your defined nodeType you need a suitable fusion object. An example configur
 *Packages/Application/Your.Package/Resources/Private/Fusion/MemberAreaRootPage.fusion*
 ```fusion
 # MemberAreaRootPage
-prototype(Your.Package:MemberAreaRootPage) < prototype(Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot) {
-
+prototype(Your.Package:MemberAreaRootPage) < prototype(Neos.Neos:Page) {
+  
 }
 ```
+
+**Hint:** Usually you would inherit from the default page prototype of your site package.
 
 ### Add pages and login form
 
@@ -111,9 +114,9 @@ member area by selecting access roles and apply the changes.
 Next you need to add a **login form** on a page which is not protected. Do not place the login form within 
 your member area or the MemberAreaRootPage. Otherwise, your users won't be able to access the login form.
 
-Now go back to the previously create MemberAreaRootPage and select the page containing the login form (`Login form page`).
+Now go back to the previously created MemberAreaRootPage and select the page containing the login form (`Login form page`).
 
-Additionally you can add further pages beneath your MemberAreaRootPage. They will be protected.
+Additionally, you can add further pages beneath your MemberAreaRootPage. They will be protected.
 
 ## Adding your own MemberArea roles
 

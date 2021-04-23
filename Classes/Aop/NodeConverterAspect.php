@@ -11,10 +11,7 @@ use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\ContentRepository\Domain\Utility\NodePaths;
 use Neos\Error\Messages\Error;
 use Neos\Flow\AOP\JoinPointInterface;
-use Neos\Flow\Configuration\ConfigurationManager;
 use Neos\Flow\Http\Request;
-use Neos\Flow\Mvc\ActionRequest;
-use Neos\Flow\Mvc\Routing\UriBuilder;
 use Neos\Flow\Security\Exception\AuthenticationRequiredException;
 
 /**
@@ -33,27 +30,6 @@ class NodeConverterAspect
      * @var \Neos\Flow\Security\Context
      */
     protected $securityContext;
-
-    /**
-     * @var UriBuilder
-     */
-    protected $uriBuilder;
-
-    /**
-     * The injection of the faked UriBuilder is necessary to generate frontend URLs from the backend
-     *
-     * @param ConfigurationManager $configurationManager
-     */
-    public function injectUriBuilder(ConfigurationManager $configurationManager)
-    {
-        $_SERVER['FLOW_REWRITEURLS'] = 1;
-        $httpRequest = Request::createFromEnvironment();
-        $request = new ActionRequest($httpRequest);
-        $uriBuilder = new UriBuilder();
-        $uriBuilder->setRequest($request);
-        $uriBuilder->setCreateAbsoluteUri(true);
-        $this->uriBuilder = $uriBuilder;
-    }
 
     /**
      * Check requested node for required authentication and throw AuthenticationRequiredException

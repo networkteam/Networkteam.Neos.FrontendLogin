@@ -5,21 +5,22 @@ namespace Networkteam\Neos\FrontendLogin\Security\Authentication\EntryPoint;
  *  (c) 2020 networkteam GmbH - all rights reserved
  ***************************************************************/
 
+use GuzzleHttp\Psr7\Utils;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\ContentRepository\Domain\Utility\NodePaths;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Flow\Annotations as Flow;
-use Neos\Flow\Http\Request;
-use Neos\Flow\Http\Response;
 use Neos\Flow\Mvc\ActionRequest;
+use Neos\Flow\Mvc\ActionResponse;
 use Neos\Flow\Mvc\Controller\Arguments;
 use Neos\Flow\Mvc\Controller\ControllerContext;
 use Neos\Flow\Security\Account;
 use Neos\Flow\Security\Authentication\EntryPoint\WebRedirect;
-use Neos\Flow\Security\Cryptography\HashService;
 use Neos\Neos\Domain\Service\ContentContext;
 use Networkteam\Neos\FrontendLogin\Service\NodeAccessService;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Find document node containing login form and redirect there.
@@ -63,7 +64,7 @@ class LoginNodeRedirect extends WebRedirect
      */
     protected $roleToMemberAreaMapping;
 
-    public function startAuthentication(Request $request, Response $response)
+    public function startAuthentication(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $originalRequest = $this->securityContext->getInterceptedRequest();
 
@@ -76,15 +77,22 @@ class LoginNodeRedirect extends WebRedirect
                     $loginFormPage = $memberAreaRootNode->getProperty('loginFormPage');
                     if ($loginFormPage instanceof NodeInterface) {
                         $uri = $this->createNodeUri($request, $loginFormPage);
-                        $response->setContent(sprintf('<html><head><meta http-equiv="refresh" content="0;url=%s"/></head></html>', htmlentities($uri, ENT_QUOTES, 'utf-8')));
-                        $response->withStatus(303);
-                        $response->withHeader('Location', $uri);
+
+                        return $response
+                            ->withBody(Utils::streamFor(sprintf(
+                                '<html><head><meta http-equiv="refresh" content="0;url=%s"/></head></html>',
+                                htmlentities($uri, ENT_QUOTES, 'utf-8')
+                            )))
+                            ->withStatus(303)
+                            ->withHeader('Location', $uri);
                     }
                 } catch (\Exception $e) {
 
                 }
             }
         }
+
+        return $response;
     }
 
     /**
@@ -92,15 +100,15 @@ class LoginNodeRedirect extends WebRedirect
      *
      * @throws \Neos\Neos\Exception
      */
-    protected function createNodeUri(Request $request, NodeInterface $node, array $arguments = []): string
+    protected function createNodeUri(ServerRequestInterface $request, NodeInterface $node, array $arguments = []): string
     {
         // initialize uriBuilder
-        $actionRequest = new ActionRequest($request);
+        $actionRequest = ActionRequest::fromHttpRequest($request);
         $this->uriBuilder->setRequest($actionRequest);
 
         $controllerContext = new ControllerContext(
             $this->uriBuilder->getRequest(),
-            new Response(),
+            new ActionResponse(),
             new Arguments([]),
             $this->uriBuilder
         );

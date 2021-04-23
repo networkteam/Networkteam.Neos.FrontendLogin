@@ -5,9 +5,9 @@ namespace Networkteam\Neos\FrontendLogin\Controller;
  *  (c) 2019 networkteam GmbH - all rights reserved
  ***************************************************************/
 
+use GuzzleHttp\Psr7\Uri;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Http\Helper\UriHelper;
-use Neos\Flow\Http\Uri;
 use Neos\Flow\I18n\Locale;
 use Neos\Flow\I18n\Service;
 use Neos\Flow\Mvc\ActionRequest;
@@ -19,6 +19,7 @@ use Neos\Flow\Security\Exception\AuthenticationRequiredException;
 use Neos\Flow\Security\Exception\InvalidArgumentForHashGenerationException;
 use Neos\Flow\Security\Exception\InvalidHashException;
 use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelper;
+use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelperFactory;
 use Psr\Http\Message\UriInterface;
 
 class AuthenticationController extends AbstractAuthenticationController
@@ -29,12 +30,6 @@ class AuthenticationController extends AbstractAuthenticationController
      * @var Service
      */
     protected $i18nService;
-
-    /**
-     * @Flow\Inject
-     * @var FlashMessageHelper
-     */
-    protected $flashMessageHelper;
 
     /**
      * @Flow\InjectConfiguration(package="Networkteam.Neos.FrontendLogin", path="redirectOnLoginLogoutExceptionUri")
@@ -109,14 +104,14 @@ class AuthenticationController extends AbstractAuthenticationController
      */
     protected function onAuthenticationFailure(AuthenticationRequiredException $exception = null)
     {
-        $this->flashMessageHelper->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
+        $this->getFlashMessageHelper()->addErrorMessage('authentication.onAuthenticationFailure.authenticationFailed', 1566923371);
 
         // build and validate redirect uri
         try {
             $redirectUriWithErrorParameter = $this->getRedirectOnErrorUri($this->request);
         } catch (\Exception $e) {
             $redirectUriWithErrorParameter = false;
-            $this->flashMessageHelper->addErrorMessage(
+            $this->getFlashMessageHelper()->addErrorMessage(
                 'authentication.onAuthenticationFailure.redirectFailed',
                 1617020324,
                 [
@@ -159,9 +154,9 @@ class AuthenticationController extends AbstractAuthenticationController
     /**
      * @param RequestInterface $request
      * @return UriInterface
-     * @throws NoSuchArgumentException
      * @throws InvalidArgumentForHashGenerationException
      * @throws InvalidHashException
+     * @throws NoSuchArgumentException
      */
     protected function getRedirectOnErrorUri(RequestInterface $request): UriInterface
     {
@@ -189,5 +184,10 @@ class AuthenticationController extends AbstractAuthenticationController
             parent::errorAction(),
             implode("<br />", $this->flashMessageContainer->getMessagesAndFlush())
         );
+    }
+
+    protected function getFlashMessageHelper(): FlashMessageHelper
+    {
+        return FlashMessageHelperFactory::create($this->request);
     }
 }

@@ -1,4 +1,4 @@
-prototype(Networkteam.Neos.FrontendLogin:Components.Atom.LoginFormProps) < prototype(Neos.Neos:ContentComponent) {
+prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginFormProps) < prototype(Neos.Neos:ContentComponent) {
     actionUri = Neos.Fusion:UriBuilder {
         package = 'Networkteam.Neos.FrontendLogin'
         controller = 'Authentication'
@@ -19,7 +19,7 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atom.LoginFormProps) < proto
     }
 
     flashMessages = Networkteam.Neos.FrontendLogin:FlashMessages
-    hasError = ${request.httpRequest.arguments['error']}
+    hasError = ${request.arguments['error']}
     labels = Neos.Fusion:RawArray {
         username = Networkteam.Neos.FrontendLogin:TranslatedValue {
             id = 'components.atoms.loginform.username'
