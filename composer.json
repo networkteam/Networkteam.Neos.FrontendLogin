@@ -23,7 +23,10 @@
     "extra": {
         "neos": {
             "package-key": "Networkteam.Neos.FrontendLogin"
-        }
+        },
+        "applied-flow-migrations": [
+            "TYPO3.FLOW3-201201261636"
+        ]
     },
     "suggest": {
         "networkteam/neos-passwordreset": "Allow users to reset their user account password within the frontend."
