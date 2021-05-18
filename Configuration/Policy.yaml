@@ -1,22 +1,22 @@
-
 privilegeTargets:
+
   Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege:
     'Networkteam.Neos.FrontendLogin:LoginForm':
       matcher: 'method(Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController->(?!initialize).*Action()) || method(Networkteam\Neos\FrontendLogin\Controller\AuthenticationController->(?!initialize).*Action())'
+
 roles:
+
+  'Networkteam.Neos.FrontendLogin:MemberArea':
+    abstract: true
+
+  'Networkteam.Neos.FrontendLogin:FrontendUser':
+    parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
+
   'Neos.Flow:Everybody':
     privileges:
       -
         privilegeTarget: 'Networkteam.Neos.FrontendLogin:LoginForm'
         permission: GRANT
-  'Networkteam.Neos.FrontendLogin:MemberArea':
-    parentRoles:
-      - 'Neos.Flow:1'
-  'Networkteam.Neos.FrontendLogin:FrontendUser':
-    parentRoles:
-      -
-        - 'Networkteam.Neos.FrontendLogin:MemberArea'
+
   'Neos.Neos:AbstractEditor':
-    parentRoles:
-      -
-        'Networkteam.Neos.FrontendLogin:FrontendUser': 'Networkteam.Neos.FrontendLogin:FrontendUser'
+    parentRoles: ['Networkteam.Neos.FrontendLogin:FrontendUser']
