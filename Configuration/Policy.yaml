@@ -1,17 +1,10 @@
 privilegeTargets:
 
-  'Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
+  Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege:
     'Networkteam.Neos.FrontendLogin:LoginForm':
       matcher: 'method(Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController->(?!initialize).*Action()) || method(Networkteam\Neos\FrontendLogin\Controller\AuthenticationController->(?!initialize).*Action())'
 
 roles:
-
-  'Neos.Flow:Everybody':
-    privileges:
-    -
-      # Grant any user access to the FrontendLoginLoginForm plugin
-      privilegeTarget: 'Networkteam.Neos.FrontendLogin:LoginForm'
-      permission: GRANT
 
   'Networkteam.Neos.FrontendLogin:MemberArea':
     abstract: true
@@ -19,9 +12,11 @@ roles:
   'Networkteam.Neos.FrontendLogin:FrontendUser':
     parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
 
+  'Neos.Flow:Everybody':
+    privileges:
+      -
+        privilegeTarget: 'Networkteam.Neos.FrontendLogin:LoginForm'
+        permission: GRANT
+
   'Neos.Neos:AbstractEditor':
-    # If you introduce new roles of type 'Networkteam.Neos.FrontendLogin:MemberArea' make sure
-    # adding them to parentRoles of 'Neos.Neos:AbstractEditor' with a named key (without a named key parentRoles
-    # defined by other packages might be overwritten)
-    parentRoles:
-      'Networkteam.Neos.FrontendLogin:FrontendUser': 'Networkteam.Neos.FrontendLogin:FrontendUser'
+    parentRoles: ['Networkteam.Neos.FrontendLogin:FrontendUser']

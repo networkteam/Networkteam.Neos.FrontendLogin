@@ -10,7 +10,7 @@ use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\ContentRepository\Domain\Utility\NodePaths;
 use Neos\Error\Messages\Error;
-use Neos\Flow\AOP\JoinPointInterface;
+use Neos\Flow\Aop\JoinPointInterface;
 use Neos\Flow\Http\Request;
 use Neos\Flow\Security\Exception\AuthenticationRequiredException;
 
