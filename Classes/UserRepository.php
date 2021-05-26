@@ -63,3 +63,4 @@ class UserRepository extends \Neos\Neos\Domain\Repository\UserRepository
     }
 
 }
+
