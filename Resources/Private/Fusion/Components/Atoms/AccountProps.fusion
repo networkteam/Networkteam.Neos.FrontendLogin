@@ -22,5 +22,14 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.AccountProps) < protot
         }
     }
 
+    @cache {
+        mode = 'uncached'
+        context {
+            1 = 'node'
+            2 = 'documentNode'
+            3 = 'site'
+        }
+    }
+
     renderer = ''
 }
