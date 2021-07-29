@@ -10,7 +10,8 @@ roles:
     abstract: true
 
   'Networkteam.Neos.FrontendLogin:FrontendUser':
-    parentRoles: ['Networkteam.Neos.FrontendLogin:MemberArea']
+    parentRoles:
+      'Networkteam.Neos.FrontendLogin:MemberArea': 'Networkteam.Neos.FrontendLogin:MemberArea'
 
   'Neos.Flow:Everybody':
     privileges:
@@ -19,4 +20,5 @@ roles:
         permission: GRANT
 
   'Neos.Neos:AbstractEditor':
-    parentRoles: ['Networkteam.Neos.FrontendLogin:FrontendUser']
+    parentRoles:
+      'Networkteam.Neos.FrontendLogin:FrontendUser': 'Networkteam.Neos.FrontendLogin:FrontendUser'
