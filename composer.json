@@ -101,7 +101,8 @@
             "Neos.NodeTypes-20190917101945",
             "Networkteam.Neos.Util-20190919145401",
             "Neos.NodeTypes-20200120114136",
-            "Neos.Kickstart-20161124230102"
+            "Neos.Kickstart-20161124230102",
+            "Neos.Setup-20161124230842"
         ]
     },
     "suggest": {
