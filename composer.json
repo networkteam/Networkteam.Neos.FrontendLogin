@@ -104,7 +104,8 @@
             "Neos.Kickstart-20161124230102",
             "Neos.Setup-20161124230842",
             "Neos.Setup-20161125014759",
-            "Neos.Kickstarter-20161125110814"
+            "Neos.Kickstarter-20161125110814",
+            "Neos.Flow-20200813181400"
         ]
     },
     "suggest": {
