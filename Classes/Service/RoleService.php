@@ -66,9 +66,12 @@ class RoleService
         $accessRoles = [];
 
         try {
-            foreach ($node->getProperty('accessRoles') as $roleIdentifier) {
-                if (!$this->isMemberAreaRole($roleIdentifier)) {
-                    $accessRoles[] = $roleIdentifier;
+            $nodeAccessRoles = $node->getProperty('accessRoles');
+            if (is_array($nodeAccessRoles)) {
+                foreach ($nodeAccessRoles as $roleIdentifier) {
+                    if (!$this->isMemberAreaRole($roleIdentifier)) {
+                        $accessRoles[] = $roleIdentifier;
+                    }
                 }
             }
         } catch (\Exception $e) {
