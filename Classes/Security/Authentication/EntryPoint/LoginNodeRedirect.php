@@ -68,7 +68,7 @@ class LoginNodeRedirect extends WebRedirect
     {
         $originalRequest = $this->securityContext->getInterceptedRequest();
 
-        if ($originalRequest->hasArgument('node')) {
+        if ($originalRequest instanceof ActionRequest && $originalRequest->hasArgument('node')) {
             $contextPath = $originalRequest->getArgument('node');
             $memberAreaRootNode = $this->getMemberAreaRootNodeForAccount($contextPath, $this->getAccount());
 
