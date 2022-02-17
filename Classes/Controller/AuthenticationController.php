@@ -182,7 +182,7 @@ class AuthenticationController extends AbstractAuthenticationController
         return sprintf(
             '%s<br />%s',
             parent::errorAction(),
-            implode("<br />", $this->flashMessageContainer->getMessagesAndFlush())
+            implode("<br />", $this->controllerContext->getFlashMessageContainer()->getMessagesAndFlush())
         );
     }
 
