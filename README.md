@@ -3,6 +3,9 @@
 Neos package for frontend login inspired by  [Flowpack.Neos.FrontendLogin](https://github.com/Flowpack/Flowpack.Neos.FrontendLogin).
 It provides a mixin for MemberAreaRootPages. The package makes use of the `accessRoles` property of `NodeInterface`.
 
+**Note:** It seems that the current Neos version 7 is compatible with this package as the deprecated parts are not jet removed.
+But be aware of breaking changes in the near future.
+
 ## Features
 
 * Place a MemberAreaRootPage within your page tree and all pages beneath it including the member area page itself will be protected
@@ -25,6 +28,7 @@ Campatibility with `neos/neos` Package
 |-----------|--------------------------------|
 | `4.x`     | `1.x`                          |
 | `5.x`     | `main` branch                  |
+| `7.x`     | `neos-7` branch                |
 
 ## Migration
 
