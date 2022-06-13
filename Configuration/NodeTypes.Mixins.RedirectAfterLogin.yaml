@@ -13,3 +13,13 @@
           editorOptions:
             nodeTypes:
               - 'Neos.Neos:Document'
+    redirectAfterFirstLogin:
+      type: reference
+      ui:
+        label: i18n
+        reloadIfChanged: false
+        inspector:
+          group: 'frontendLogin.actions'
+          editorOptions:
+            nodeTypes:
+              - 'Neos.Neos:Document'

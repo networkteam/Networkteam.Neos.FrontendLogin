@@ -18,6 +18,7 @@ use Neos\Flow\Security\Cryptography\HashService;
 use Neos\Flow\Security\Exception\AuthenticationRequiredException;
 use Neos\Flow\Security\Exception\InvalidArgumentForHashGenerationException;
 use Neos\Flow\Security\Exception\InvalidHashException;
+use Neos\Flow\Security\Policy\PolicyService;
 use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelper;
 use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelperFactory;
 use Psr\Http\Message\UriInterface;
@@ -42,6 +43,12 @@ class AuthenticationController extends AbstractAuthenticationController
      * @Flow\Inject
      */
     protected $hashService;
+
+    /**
+     * @Flow\Inject
+     * @var PolicyService
+     */
+    protected $policyService;
 
     public function initializeAction()
     {
@@ -89,6 +96,21 @@ class AuthenticationController extends AbstractAuthenticationController
             $redirectAfterLoginUri = $this->hashService->validateAndStripHmac(
                 $this->request->getArgument('redirectAfterLoginUri')
             );
+
+            // get redirect uri for first successful authentication
+            try {
+                $hasFirstSuccessfulAuthenticationRole = $this->authenticationManager->getSecurityContext()->getAccount()->hasRole(
+                    $this->policyService->getRole('Networkteam.Neos.FrontendLogin:FirstSuccessfulAuthentication')
+                );
+
+                if ($hasFirstSuccessfulAuthenticationRole && $this->request->hasArgument('redirectAfterFirstLoginUri')) {
+                    $redirectAfterLoginUri = $this->hashService->validateAndStripHmac(
+                        $this->request->getArgument('redirectAfterFirstLoginUri')
+                    );
+                }
+            } catch (\Exception $e) {
+
+            }
         } catch (\Exception $e) {
             $redirectAfterLoginUri = $this->redirectOnLoginLogoutExceptionUri;
         }
