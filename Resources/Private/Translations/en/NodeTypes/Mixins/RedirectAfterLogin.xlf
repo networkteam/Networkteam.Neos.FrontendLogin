@@ -8,6 +8,9 @@
             <trans-unit id="properties.redirectAfterLogin.ui.help.message" xml:space="preserve">
                 <source>You can choose from any DocumentNode within the page tree, especially those within member area.</source>
             </trans-unit>
+            <trans-unit id="properties.redirectAfterFirstLogin" xml:space="preserve">
+                <source>Page after FIRST login</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
