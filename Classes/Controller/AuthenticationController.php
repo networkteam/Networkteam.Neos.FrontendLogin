@@ -130,9 +130,9 @@ class AuthenticationController extends AbstractAuthenticationController
 
         // build and validate redirect uri
         try {
-            $redirectUriWithErrorParameter = $this->getRedirectOnErrorUri($this->request);
+            $redirectUri = $this->getRedirectOnErrorUri($this->request);
         } catch (\Exception $e) {
-            $redirectUriWithErrorParameter = false;
+            $redirectUri = $this->redirectOnLoginLogoutExceptionUri;
             $this->getFlashMessageHelper()->addErrorMessage(
                 'authentication.onAuthenticationFailure.redirectFailed',
                 1617020324,
@@ -143,14 +143,7 @@ class AuthenticationController extends AbstractAuthenticationController
             );
         }
 
-        // For $redirectUriWithErrorParameter being false the errorAction() should be called
-        if ($redirectUriWithErrorParameter !== false) {
-            try {
-                $this->redirectToUri($redirectUriWithErrorParameter);
-            } catch (\Neos\Flow\Security\Exception $e) {
-
-            }
-        }
+        $this->redirectToUri($redirectUri);
     }
 
     protected function validateHmac(string $string): bool
