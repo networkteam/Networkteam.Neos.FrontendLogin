@@ -6,3 +6,4 @@
   ui:
     label: i18n
     icon: 'icon-id-card'
+    group: frontendLogin
