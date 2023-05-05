@@ -6,6 +6,7 @@ namespace Networkteam\Neos\FrontendLogin\Service;
  ***************************************************************/
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Persistence\QueryInterface;
 use Neos\Flow\Persistence\QueryResultInterface;
 use Neos\Flow\Security\AccountFactory;
 use Neos\Neos\Domain\Model\User;
@@ -30,21 +31,29 @@ class UserService extends \Neos\Neos\Domain\Service\UserService
      * @param string $authenticationProviderName
      * @return QueryResultInterface
      */
-    public function getUsers(string $authenticationProviderName = null): QueryResultInterface
+    public function getUsers(string $sortBy = 'accounts.accountIdentifier', string $sortDirection = QueryInterface::ORDER_ASCENDING, string $authenticationProviderName = null): QueryResultInterface
     {
-        return $this->userRepository->findByAuthenticationProviderName($authenticationProviderName ?: $this->defaultAuthenticationProviderName);
+        return $this->userRepository->findByAuthenticationProviderName(
+            $authenticationProviderName ?: $this->defaultAuthenticationProviderName,
+            $sortBy,
+            $sortDirection
+        );
     }
 
     /**
      * @param string $searchTerm
-     * @param string $authenticationProviderName
+     * @param string $sortBy
+     * @param string $sortDirection
+     * @param string|null $authenticationProviderName
      * @return QueryResultInterface
      */
-    public function searchUsers(string $searchTerm, string $authenticationProviderName = null): QueryResultInterface
+    public function searchUsers(string $searchTerm, string $sortBy, string $sortDirection, string $authenticationProviderName = null): QueryResultInterface
     {
         return $this->userRepository->findBySearchTermAndAuthenticationProviderName(
             $searchTerm,
-            $authenticationProviderName ?: $this->defaultAuthenticationProviderName
+            $authenticationProviderName ?: $this->defaultAuthenticationProviderName,
+            $sortBy,
+            $sortDirection
         );
     }
 
