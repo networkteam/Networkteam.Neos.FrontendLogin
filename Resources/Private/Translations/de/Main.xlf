@@ -40,7 +40,7 @@
             </trans-unit>
             <trans-unit id="loginhandler.inbackend" xml:space="preserve">
                 <source>Form is disabled in backend mode.</source>
-                <target>Das Formular is im Backend-Modus deaktiviert.</target>
+                <target>Das Formular ist im Backend-Modus deaktiviert.</target>
             </trans-unit>
 
             <!-- nodeTypes -->
