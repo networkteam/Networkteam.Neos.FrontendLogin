@@ -5,7 +5,7 @@ Neos:
         providers:
           'Neos.Neos:Backend':
             requestPatterns:
-              'Neos.Neos.FrontendLogin:NeosBackend':
+              'Networkteam.Neos.FrontendLogin:NeosBackend':
                 pattern: Networkteam\Neos\FrontendLogin\Security\NeosRequestPattern
           'Networkteam.Neos.FrontendLogin:Frontend':
             provider: PersistedUsernamePasswordProvider
