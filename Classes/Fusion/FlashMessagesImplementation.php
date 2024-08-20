@@ -29,7 +29,7 @@ class FlashMessagesImplementation extends AbstractFusionObject
         $actionRequest = ActionRequest::fromHttpRequest($this->getHttpRequest());
         $flashMessageContainer = $this->flashMessageService->getFlashMessageContainerForRequest($actionRequest);
 
-        if ($this->getHttpRequest()->getMethod() === "GET") {
+        if ($this->getFlush()) {
             return $flashMessageContainer->getMessagesAndFlush($severity);
         } else {
             return $flashMessageContainer->getMessages($severity);
@@ -44,5 +44,10 @@ class FlashMessagesImplementation extends AbstractFusionObject
     public function getHttpRequest(): ServerRequestInterface
     {
         return $this->fusionValue('httpRequest');
+    }
+
+    public function getFlush(): bool
+    {
+        return (bool)$this->fusionValue('flush');
     }
 }

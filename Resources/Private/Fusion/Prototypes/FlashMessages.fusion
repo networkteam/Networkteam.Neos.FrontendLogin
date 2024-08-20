@@ -3,4 +3,5 @@ prototype(Networkteam.Neos.FrontendLogin:FlashMessages) {
 
     severity = null
     httpRequest = ${request.httpRequest}
+    flush = true
 }
