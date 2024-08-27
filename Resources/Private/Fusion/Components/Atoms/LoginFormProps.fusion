@@ -13,6 +13,11 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginFormProps) < prot
         @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
     }
 
+    redirectAfterFirstLoginUri = Neos.Neos:NodeUri {
+        node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterFirstLogin')}
+        @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
+    }
+
     redirectOnErrorUri = Neos.Neos:NodeUri {
         node = ${documentNode}
         @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}

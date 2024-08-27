@@ -10,3 +10,4 @@
   ui:
     label: i18n
     icon: 'icon-fingerprint'
+    group: frontendLogin

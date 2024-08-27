@@ -10,6 +10,9 @@
                 <source>You can choose from any page within the page tree, especially those within member area.</source>
                 <target>Sie können jede Seite innerhalb des Seitenbaums wählen, insbesondere die aus dem Mitgliederbereich.</target>
             </trans-unit>
+            <trans-unit id="properties.redirectAfterFirstLogin" xml:space="preserve">
+                <target>Seite nach ERSTER Anmeldung</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
