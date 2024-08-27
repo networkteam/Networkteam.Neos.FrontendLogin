@@ -9,6 +9,7 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\Mvc\FlashMessage\FlashMessageService;
 use Neos\Fusion\FusionObjects\AbstractFusionObject;
+use Psr\Http\Message\ServerRequestInterface;
 
 class FlashMessagesImplementation extends AbstractFusionObject
 {
@@ -28,7 +29,11 @@ class FlashMessagesImplementation extends AbstractFusionObject
         $actionRequest = ActionRequest::fromHttpRequest($this->getHttpRequest());
         $flashMessageContainer = $this->flashMessageService->getFlashMessageContainerForRequest($actionRequest);
 
-        return $flashMessageContainer->getMessagesAndFlush($severity);
+        if ($this->getFlush()) {
+            return $flashMessageContainer->getMessagesAndFlush($severity);
+        } else {
+            return $flashMessageContainer->getMessages($severity);
+        }
     }
 
     public function getSeverity(): ?string
@@ -36,8 +41,13 @@ class FlashMessagesImplementation extends AbstractFusionObject
         return $this->fusionValue('severity');
     }
 
-    public function getHttpRequest()
+    public function getHttpRequest(): ServerRequestInterface
     {
         return $this->fusionValue('httpRequest');
+    }
+
+    public function getFlush(): bool
+    {
+        return (bool)$this->fusionValue('flush');
     }
 }

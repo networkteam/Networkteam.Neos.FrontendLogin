@@ -14,6 +14,7 @@ use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\Mvc\Exception\NoSuchArgumentException;
 use Neos\Flow\Mvc\RequestInterface;
 use Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController;
+use Neos\Flow\Security\Authentication\TokenInterface;
 use Neos\Flow\Security\Cryptography\HashService;
 use Neos\Flow\Security\Exception\AuthenticationRequiredException;
 use Neos\Flow\Security\Exception\InvalidArgumentForHashGenerationException;
@@ -45,6 +46,12 @@ class AuthenticationController extends AbstractAuthenticationController
     protected $hashService;
 
     /**
+     * @Flow\InjectConfiguration(path="authenticationProviderName")
+     * @var string
+     */
+    protected $authenticationProviderName;
+
+    /**
      * @Flow\Inject
      * @var PolicyService
      */
@@ -68,7 +75,12 @@ class AuthenticationController extends AbstractAuthenticationController
      */
     public function logoutAction()
     {
-        parent::logoutAction();
+        foreach ($this->authenticationManager->getSecurityContext()->getAuthenticationTokens() as $token) {
+            // logout only frontend token
+            if ($token->getAuthenticationProviderName() == $this->authenticationProviderName) {
+                $token->setAuthenticationStatus(TokenInterface::NO_CREDENTIALS_GIVEN);
+            }
+        }
 
         try {
             $redirectAfterLogoutUri = $this->hashService->validateAndStripHmac(

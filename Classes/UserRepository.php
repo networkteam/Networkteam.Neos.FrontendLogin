@@ -23,16 +23,18 @@ class UserRepository extends \Neos\Neos\Domain\Repository\UserRepository
 
     /**
      * @param string $authenticationProviderName
+     * @param string $sortBy
+     * @param string $sortDirection
      * @return QueryResultInterface
      */
-    public function findByAuthenticationProviderName(string $authenticationProviderName): QueryResultInterface
+    public function findByAuthenticationProviderName(string $authenticationProviderName, string $sortBy = 'accounts.accountIdentifier', string $sortDirection = QueryInterface::ORDER_ASCENDING): QueryResultInterface
     {
         try {
             $query = $this->createQuery();
             $query->matching(
                 $query->equals('accounts.authenticationProviderName', $authenticationProviderName),
             );
-            return $query->setOrderings(['accounts.accountIdentifier' => QueryInterface::ORDER_ASCENDING])->execute();
+            return $query->setOrderings([$sortBy => $sortDirection])->execute();
         } catch (\Neos\Flow\Persistence\Exception\InvalidQueryException $e) {
             throw new \RuntimeException($e->getMessage(), 1621946651, $e);
         }
