@@ -6,10 +6,12 @@ namespace Networkteam\Neos\FrontendLogin\Controller;
  ***************************************************************/
 
 use GuzzleHttp\Psr7\Uri;
+use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Http\Helper\UriHelper;
 use Neos\Flow\I18n\Locale;
 use Neos\Flow\I18n\Service;
+use Neos\Flow\Log\Utility\LogEnvironment;
 use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\Mvc\Exception\NoSuchArgumentException;
 use Neos\Flow\Mvc\RequestInterface;
@@ -23,6 +25,7 @@ use Neos\Flow\Security\Policy\PolicyService;
 use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelper;
 use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelperFactory;
 use Psr\Http\Message\UriInterface;
+use Psr\Log\LoggerInterface;
 
 class AuthenticationController extends AbstractAuthenticationController
 {
@@ -56,6 +59,11 @@ class AuthenticationController extends AbstractAuthenticationController
      * @var PolicyService
      */
     protected $policyService;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     public function initializeAction()
     {
@@ -99,10 +107,29 @@ class AuthenticationController extends AbstractAuthenticationController
      */
     protected function onAuthenticationSuccess(ActionRequest $originalRequest = null)
     {
+        $additionalRequestArguments = [];
+
         if ($originalRequest !== null) {
-            // Redirect to the location that redirected to the login form because the user was nog logged in
-            $this->redirectToRequest($originalRequest);
+            try {
+                $node = $originalRequest->getArgument('node');
+                // $node is of type string. it is the node path including context
+                if (str_contains($node, '/installerportalroot/orders/ordertypestatusfolder/')) {
+                    //TODO: get orderId parameter
+                    $additionalRequestArguments = $originalRequest->getArguments();
+                } else {
+                    // Redirect to the location that redirected to the login form because the user was nog logged in
+                    $this->redirectToRequest($originalRequest);
+                }
+            } catch (\Neos\Flow\Mvc\Exception\NoSuchArgumentException) {
+                // Redirect to the location that redirected to the login form because the user was nog logged in
+                $this->redirectToRequest($originalRequest);
+            }
         }
+
+        $this->logger->info(
+            'DEBUG no originial request availalbe',
+            LogEnvironment::fromMethodName(__METHOD__)
+        );
 
         try {
             $redirectAfterLoginUri = $this->hashService->validateAndStripHmac(
@@ -127,7 +154,11 @@ class AuthenticationController extends AbstractAuthenticationController
             $redirectAfterLoginUri = $this->redirectOnLoginLogoutExceptionUri;
         }
 
-        $this->redirectToUri($redirectAfterLoginUri);
+
+        $redirectAfterLoginUri = \GuzzleHttp\Psr7\Uri::withQueryValues(new Uri($redirectAfterLoginUri), $additionalRequestArguments);
+
+
+        $this->redirectToUri((string)$redirectAfterLoginUri);
     }
 
     /**
