@@ -42,12 +42,6 @@ class LoginNodeRedirect extends WebRedirect
 
     /**
      * @Flow\Inject
-     * @var ContextFactoryInterface
-     */
-    protected $contextFactory;
-
-    /**
-     * @Flow\Inject
      * @var \Neos\Neos\Service\LinkingService
      */
     protected $linkingService;
@@ -63,6 +57,8 @@ class LoginNodeRedirect extends WebRedirect
      * @var array
      */
     protected $roleToMemberAreaMapping;
+    #[\Neos\Flow\Annotations\Inject]
+    protected \Neos\ContentRepositoryRegistry\ContentRepositoryRegistry $contentRepositoryRegistry;
 
     public function startAuthentication(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
@@ -72,10 +68,10 @@ class LoginNodeRedirect extends WebRedirect
             $contextPath = $originalRequest->getArgument('node');
             $memberAreaRootNode = $this->getMemberAreaRootNodeForAccount($contextPath, $this->getAccount());
 
-            if ($memberAreaRootNode instanceof NodeInterface) {
+            if ($memberAreaRootNode instanceof \Neos\ContentRepository\Core\Projection\ContentGraph\Node) {
                 try {
                     $loginFormPage = $memberAreaRootNode->getProperty('loginFormPage');
-                    if ($loginFormPage instanceof NodeInterface) {
+                    if ($loginFormPage instanceof \Neos\ContentRepository\Core\Projection\ContentGraph\Node) {
                         $uri = $this->createNodeUri($request, $loginFormPage);
 
                         return $response
@@ -100,7 +96,7 @@ class LoginNodeRedirect extends WebRedirect
      *
      * @throws \Neos\Neos\Exception
      */
-    protected function createNodeUri(ServerRequestInterface $request, NodeInterface $node, array $arguments = []): string
+    protected function createNodeUri(ServerRequestInterface $request, \Neos\ContentRepository\Core\Projection\ContentGraph\Node $node, array $arguments = []): string
     {
         // initialize uriBuilder
         $actionRequest = ActionRequest::fromHttpRequest($request);
@@ -113,17 +109,23 @@ class LoginNodeRedirect extends WebRedirect
             $this->uriBuilder
         );
 
+        // TODO 9.0 migration: !! MEGA DIRTY CODE! Ensure to rewrite this; by getting rid of LegacyContextStub.
+        $contentRepository = $this->contentRepositoryRegistry->get(\Neos\ContentRepository\Core\SharedModel\ContentRepository\ContentRepositoryId::fromString('default'));
+        $workspace = $contentRepository->findWorkspaceByName(\Neos\ContentRepository\Core\SharedModel\Workspace\WorkspaceName::fromString($node->getContext()->workspaceName ?? 'live'));
+        $rootNodeAggregate = $contentRepository->getContentGraph($workspace->workspaceName)->findRootNodeAggregateByType(\Neos\ContentRepository\Core\NodeType\NodeTypeName::fromString('Neos.Neos:Sites'));
+        $subgraph = $contentRepository->getContentGraph($workspace->workspaceName)->getSubgraph(\Neos\ContentRepository\Core\DimensionSpace\DimensionSpacePoint::fromLegacyDimensionArray($node->getContext()->dimensions ?? []), $node->getContext()->invisibleContentShown ? \Neos\ContentRepository\Core\Projection\ContentGraph\VisibilityConstraints::withoutRestrictions() : \Neos\ContentRepository\Core\Projection\ContentGraph\VisibilityConstraints::default());
+
         return $this->linkingService->createNodeUri(
             $controllerContext,
             $node,
-            $node->getContext()->getRootNode(),
+            $subgraph->findNodeById($rootNodeAggregate->nodeAggregateId),
             'html',
             true,
             $arguments
         );
     }
 
-    protected function getMemberAreaRootNodeForAccount($contextPath, ?Account $account = null): ?NodeInterface
+    protected function getMemberAreaRootNodeForAccount($contextPath, ?Account $account = null): ?\Neos\ContentRepository\Core\Projection\ContentGraph\Node
     {
         $memberAreaRootNode = null;
         $nodePathAndContext = NodePaths::explodeContextPath($contextPath);
@@ -135,6 +137,7 @@ class LoginNodeRedirect extends WebRedirect
             // find MemberAreaRoot node authenticated user can access
             $memberAreaRootNodeType = $this->getMemberAreaNodeTypeForAccount($account);
             if ($memberAreaRootNodeType) {
+                // TODO 9.0 migration: !! ContentContext::getCurrentSiteNode() is removed in Neos 9.0. Use Subgraph and traverse up to "Neos.Neos:Site" node.
                 $q = new FlowQuery([$contentContext->getCurrentSiteNode()]);
                 $memberAreaRootNode = $q->find(sprintf('[instanceof %s]', $memberAreaRootNodeType))->get(0);
             }
@@ -143,7 +146,7 @@ class LoginNodeRedirect extends WebRedirect
             $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext, &$memberAreaRootNode) {
                 try {
                     $requestedNode = $contentContext->getNode($nodePath);
-                    if ($requestedNode instanceof NodeInterface) {
+                    if ($requestedNode instanceof \Neos\ContentRepository\Core\Projection\ContentGraph\Node) {
                         // find closest MemberAreaRoot node starting from requested node an traversing all parents
                         $q = new FlowQuery([$requestedNode]);
                         $memberAreaRootNode = $q->closest(sprintf('[instanceof %s]', NodeAccessService::MEMBERAREAROOT_NODETYPE_NAME))->get(0);
@@ -156,7 +159,7 @@ class LoginNodeRedirect extends WebRedirect
         return $memberAreaRootNode;
     }
 
-    protected function createContext($workspaceName, array $dimensions = null): ContentContext
+    protected function createContext($workspaceName, array $dimensions = null): \Neos\Rector\ContentRepository90\Legacy\LegacyContextStub
     {
         $contextConfiguration = array(
             'workspaceName' => $workspaceName,
@@ -168,7 +171,7 @@ class LoginNodeRedirect extends WebRedirect
             $contextConfiguration['dimensions'] = $dimensions;
         }
 
-        return $this->contextFactory->create($contextConfiguration);
+        return new \Neos\Rector\ContentRepository90\Legacy\LegacyContextStub($contextConfiguration);
     }
 
     protected function getMemberAreaNodeTypeForAccount(Account $account): ?string

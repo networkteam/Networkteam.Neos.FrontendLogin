@@ -30,21 +30,27 @@ class NodeAccessService
      */
     protected $roleService;
 
-    /**
-     * @Flow\Inject
-     * @var NodeService
-     */
-    protected $nodeService;
+    // FIXME: Neos\ContentRepository\Domain\Service\NodeService does not exists anymore
+//    /**
+//     * @Flow\Inject
+//     * @var NodeService
+//     */
+//    protected $nodeService;
+
+    #[\Neos\Flow\Annotations\Inject]
+    protected \Neos\ContentRepositoryRegistry\ContentRepositoryRegistry $contentRepositoryRegistry;
 
     /**
      * Update access roles for node being part of member area (MemberAreaRoot as parent). This method is triggerd
      * when a node is updated (edit, move)
-     * @param NodeInterface $node
+     * @param \Neos\ContentRepository\Core\Projection\ContentGraph\Node $node
      */
-    public function updateAccessRoles(NodeInterface $node)
+    public function updateAccessRoles(\Neos\ContentRepository\Core\Projection\ContentGraph\Node $node)
     {
-        $isDocumentNode = $node->getNodeType()->isOfType('Neos.Neos:Document');
-        $isProcessedNode = in_array($node->getIdentifier(), $this->processedNodes);
+        $contentRepository = $this->contentRepositoryRegistry->get($node->contentRepositoryId);
+        $isDocumentNode = $contentRepository->getNodeTypeManager()->getNodeType($node->nodeTypeName)->isOfType('Neos.Neos:Document');
+        // TODO 9.0 migration: Check if you could change your code to work with the NodeAggregateId value object instead.
+        $isProcessedNode = in_array($node->aggregateId->value, $this->processedNodes);
 
         if (!$isDocumentNode || $isProcessedNode) {
             return;
@@ -57,29 +63,31 @@ class NodeAccessService
             return;
         }
 
-        if ($memberAreaRootNode instanceof NodeInterface) {
+        if ($memberAreaRootNode instanceof \Neos\ContentRepository\Core\Projection\ContentGraph\Node) {
             $accessRoles = $memberAreaRootNode->getProperty('accessRoles') ?? [];
             $this->setMemberAreaAccessRoles($node, $accessRoles);
         } else {
             $this->removeAllMemberAreaRoles($node);
         }
 
-        $this->processedNodes[] = $node->getIdentifier();
+        // TODO 9.0 migration: Check if you could change your code to work with the NodeAggregateId value object instead.
+        $this->processedNodes[] = $node->aggregateId->value;
     }
 
     /**
      * Set accessRoles properties (accessRoles, _accessRoles) on all children of MemberAreaRoot node and
      * MemberAreaRoot node itself.
      *
-     * @param NodeInterface $node
+     * @param \Neos\ContentRepository\Core\Projection\ContentGraph\Node $node
      * @param $propertyName
      * @param $oldValue
      * @param $value
      * @throws \Neos\Eel\Exception
      */
-    public function setAccessRolesOnMemberAreaRootAndChildren(NodeInterface $node, $propertyName, $oldValue, $value): void
+    public function setAccessRolesOnMemberAreaRootAndChildren(\Neos\ContentRepository\Core\Projection\ContentGraph\Node $node, $propertyName, $oldValue, $value): void
     {
-        $isMemberAreaRootNode = $node->getNodeType()->isOfType(self::MEMBERAREAROOT_NODETYPE_NAME) && $node->getNodeType()->isOfType('Neos.Neos:Document');
+        $contentRepository = $this->contentRepositoryRegistry->get($node->contentRepositoryId);
+        $isMemberAreaRootNode = $contentRepository->getNodeTypeManager()->getNodeType($node->nodeTypeName)->isOfType(self::MEMBERAREAROOT_NODETYPE_NAME) && $contentRepository->getNodeTypeManager()->getNodeType($node->nodeTypeName)->isOfType('Neos.Neos:Document');
         $isAccessRolesProperty = $propertyName === 'accessRoles';
 
         if ($isMemberAreaRootNode && $isAccessRolesProperty) {
@@ -92,27 +100,30 @@ class NodeAccessService
             $children = $q->find(sprintf('[instanceof %s]', NodeAccessService::MIXINS_ACCESSROLES_NODETYPE_NAME));
 
             /** @var NodeInterface $childNode */
+            // TODO 9.0 migration: !! Node::setProperty() is not supported by the new CR. Use the "SetNodeProperties" command to change property values.
             foreach ($children as $childNode) {
                 // this leads to an node update signal which triggers the execution of self::updateAccessRoles
+                // TODO 9.0 migration: !! Node::setProperty() is not supported by the new CR. Use the "SetNodeProperties" command to change property values.
                 $childNode->setProperty($propertyName, $value);
             }
         }
     }
 
-    protected function getMemberAreaRootNodeFromDocumentNode(NodeInterface $node): ?NodeInterface
+    protected function getMemberAreaRootNodeFromDocumentNode(\Neos\ContentRepository\Core\Projection\ContentGraph\Node $node): ?\Neos\ContentRepository\Core\Projection\ContentGraph\Node
     {
-        if ($node->getNodeType()->isOfType(self::MEMBERAREAROOT_NODETYPE_NAME)) {
+        $contentRepository = $this->contentRepositoryRegistry->get($node->contentRepositoryId);
+        if ($contentRepository->getNodeTypeManager()->getNodeType($node->nodeTypeName)->isOfType(self::MEMBERAREAROOT_NODETYPE_NAME)) {
             return $node;
         }
 
         $q = new FlowQuery([$node]);
-        /** @var NodeInterface $memberAreaRootNode */
+        /** @var \Neos\ContentRepository\Core\Projection\ContentGraph\Node $memberAreaRootNode */
         $memberAreaRootNodes = $q->parents('[instanceof ' . self::MEMBERAREAROOT_NODETYPE_NAME . ']');
 
         return $memberAreaRootNodes->get(0);
     }
 
-    protected function setMemberAreaAccessRoles(NodeInterface $node, array $accessRoles): void
+    protected function setMemberAreaAccessRoles(\Neos\ContentRepository\Core\Projection\ContentGraph\Node $node, array $accessRoles): void
     {
         // before adding roles we need to remove all other member area nodes
         $defaultAccessRoles = $this->roleService->getAccessRolesForNodeWithoutMemberAreaRoles($node);
@@ -120,14 +131,18 @@ class NodeAccessService
 
         // We do not need to check for existance of frontend user roles to prevent a nodeUpdate signal.
         // This is done within \Neos\ContentRepository\Domain\Model\Node::setAccessRoles
+        // TODO 9.0 migration: !! Node::setAccessRoles() is not supported by the new CR.
         $node->setAccessRoles($accessRoles);
+        // TODO 9.0 migration: !! Node::setProperty() is not supported by the new CR. Use the "SetNodeProperties" command to change property values.
         $node->setProperty('accessRoles', $accessRoles);
     }
 
-    protected function removeAllMemberAreaRoles(NodeInterface $node): void
+    protected function removeAllMemberAreaRoles(\Neos\ContentRepository\Core\Projection\ContentGraph\Node $node): void
     {
         $defaultAccessRoles = $this->roleService->getAccessRolesForNodeWithoutMemberAreaRoles($node);
+        // TODO 9.0 migration: !! Node::setAccessRoles() is not supported by the new CR.
         $node->setAccessRoles(array_unique($defaultAccessRoles));
+        // TODO 9.0 migration: !! Node::setProperty() is not supported by the new CR. Use the "SetNodeProperties" command to change property values.
         $node->setProperty('accessRoles', $defaultAccessRoles);
     }
 }

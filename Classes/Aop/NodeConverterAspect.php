@@ -21,12 +21,6 @@ class NodeConverterAspect
 {
     /**
      * @Flow\Inject
-     * @var ContextFactoryInterface
-     */
-    protected $contextFactory;
-
-    /**
-     * @Flow\Inject
      * @var \Neos\Flow\Security\Context
      */
     protected $securityContext;
@@ -55,7 +49,7 @@ class NodeConverterAspect
             $nodePath = $nodePathAndContext['nodePath'];
             $workspaceName = $nodePathAndContext['workspaceName'];
             $dimensions = $nodePathAndContext['dimensions'];
-            $contentContext = $this->contextFactory->create($this->prepareContextProperties($workspaceName, $dimensions));
+            $contentContext = new \Neos\Rector\ContentRepository90\Legacy\LegacyContextStub($this->prepareContextProperties($workspaceName, $dimensions));
 
             // try to find node by disabling authorization checks (CSRF token, policies, content security, ...)
             $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext) {
@@ -67,7 +61,7 @@ class NodeConverterAspect
                 }
 
                 // throw AuthenticationRequiredException so that configured EntryPoint can take action
-                if ($requestedNode instanceof NodeInterface && $requestedNode->hasAccessRestrictions() && !$requestedNode->isAccessible()) {
+                if ($requestedNode instanceof \Neos\ContentRepository\Core\Projection\ContentGraph\Node && $requestedNode->hasAccessRestrictions() && !$requestedNode->isAccessible()) {
                     throw new AuthenticationRequiredException('Requested node is available but has access restrictions.', 1598341784);
                 }
             });

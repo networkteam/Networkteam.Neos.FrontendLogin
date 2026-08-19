@@ -58,10 +58,10 @@ class RoleService
     /**
      * Remove all MemberArea roles from given node and return remaining roles
      *
-     * @param NodeInterface $node
+     * @param \Neos\ContentRepository\Core\Projection\ContentGraph\Node $node
      * @return array Returns an array of remaining roles
      */
-    public function getAccessRolesForNodeWithoutMemberAreaRoles(NodeInterface $node): array
+    public function getAccessRolesForNodeWithoutMemberAreaRoles(\Neos\ContentRepository\Core\Projection\ContentGraph\Node $node): array
     {
         $accessRoles = [];
 
