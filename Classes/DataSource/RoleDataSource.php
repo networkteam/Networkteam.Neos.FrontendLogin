@@ -5,6 +5,7 @@ namespace Networkteam\Neos\FrontendLogin\DataSource;
  *  (c) 2018 networkteam GmbH - all rights reserved
  ***************************************************************/
 
+use Neos\ContentRepository\Core\Projection\ContentGraph\Node;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Neos\Service\DataSource\AbstractDataSource;
@@ -27,12 +28,12 @@ class RoleDataSource extends AbstractDataSource
      * Get data
      * The return value must be JSON serializable data structure.
      *
-     * @param NodeInterface $node The node that is currently edited (optional)
+     * @param Node $node The node that is currently edited (optional)
      * @param array $arguments Additional arguments (key / value)
      * @return mixed JSON serializable data
      * @api
      */
-    public function getData(NodeInterface $node = null, array $arguments = [])
+    public function getData(?Node $node = null, array $arguments = [])
     {
         $memberAreaRoles = $this->roleService->getMemberAreaRoles();
         $roles = [];
@@ -47,8 +48,8 @@ class RoleDataSource extends AbstractDataSource
 
         // Sort roles by group first and than by label.
         // @see https://neos.readthedocs.io/en/stable/References/PropertyEditorReference.html?highlight=SelectBoxEditor
-        uasort($roles, ['self', 'sortRolesByPackageKey']);
-        uasort($roles, ['self', 'sortRolesByLabel']);
+        uasort($roles, self::sortRolesByPackageKey(...));
+        uasort($roles, self::sortRolesByLabel(...));
 
         return $roles;
     }
