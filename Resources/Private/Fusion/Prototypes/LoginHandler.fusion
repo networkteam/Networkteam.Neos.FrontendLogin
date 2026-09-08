@@ -4,7 +4,7 @@ prototype(Networkteam.Neos.FrontendLogin:LoginHandler) < prototype(Neos.Fusion:C
             label = Networkteam.Neos.FrontendLogin:TranslatedValue {
                 id = 'loginhandler.inbackend'
             }
-            condition = ${node.context.inBackend}
+            condition = ${renderingMode.isEdit}
             renderer = ${'<p>' + this.label + '</p>'}
         }
 

@@ -1,3 +1,0 @@
-'Neos.Neos:Document':
-  superTypes:
-    'Networkteam.Neos.FrontendLogin:Mixins.AccessRoles': true

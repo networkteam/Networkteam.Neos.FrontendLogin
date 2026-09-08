@@ -9,12 +9,12 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginFormProps) < prot
     }
 
     redirectAfterLoginUri = Neos.Neos:NodeUri {
-        node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogin')}
+        node = ${q(node).referenceNodes('redirectAfterLogin').get(0)}
         @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
     }
 
     redirectAfterFirstLoginUri = Neos.Neos:NodeUri {
-        node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterFirstLogin')}
+        node = ${q(node).referenceNodes('redirectAfterFirstLogin').get(0)}
         @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
     }
 
@@ -25,7 +25,7 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.LoginFormProps) < prot
 
     flashMessages = Networkteam.Neos.FrontendLogin:FlashMessages
     hasError = ${request.arguments['error']}
-    labels = Neos.Fusion:RawArray {
+    labels = Neos.Fusion:DataStructure {
         username = Networkteam.Neos.FrontendLogin:TranslatedValue {
             id = 'components.atoms.loginform.username'
         }

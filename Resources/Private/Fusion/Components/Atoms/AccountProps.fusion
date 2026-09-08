@@ -6,11 +6,11 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.AccountProps) < protot
     }
 
     redirectAfterLogoutUri = Neos.Neos:NodeUri {
-        node = ${q(node).context({inaccessibleContentShown: true}).property('redirectAfterLogout')}
+        node = ${q(node).property('redirectAfterLogout')}
         @process.hmac = ${Networkteam.Neos.FrontendLogin.Hash.appendHmac(value)}
     }
 
-    labels = Neos.Fusion:RawArray {
+    labels = Neos.Fusion:DataStructure {
         statusMessage = Networkteam.Neos.FrontendLogin:TranslatedValue {
             id = 'components.atoms.account.statusMessage'
             arguments {

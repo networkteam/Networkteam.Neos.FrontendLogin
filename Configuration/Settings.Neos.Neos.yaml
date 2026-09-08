@@ -1,0 +1,24 @@
+Neos:
+  Neos:
+
+    userInterface:
+      translation:
+        autoInclude:
+          Networkteam.Neos.FrontendLogin:
+            - 'NodeTypes/*'
+            - Main
+
+    fusion:
+      autoInclude:
+        'Networkteam.Neos.FrontendLogin': true
+    nodeTypes:
+      groups:
+        frontendLogin:
+          label: 'Frontend-Login'
+          icon: 'fas fa-user-lock'
+
+  Fusion:
+    defaultContext:
+      Networkteam.Neos.FrontendLogin.Hash: \Networkteam\Neos\FrontendLogin\Eel\HashHelper
+      Networkteam.Neos.FrontendLogin.User: \Networkteam\Neos\FrontendLogin\Eel\UserHelper
+      Networkteam.Neos.FrontendLogin.Locale: \Networkteam\Neos\FrontendLogin\Eel\LocaleHelper

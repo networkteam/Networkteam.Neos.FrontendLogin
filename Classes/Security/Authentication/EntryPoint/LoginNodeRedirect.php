@@ -6,200 +6,105 @@ namespace Networkteam\Neos\FrontendLogin\Security\Authentication\EntryPoint;
  ***************************************************************/
 
 use GuzzleHttp\Psr7\Utils;
-use Neos\ContentRepository\Domain\Model\NodeInterface;
-use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
-use Neos\ContentRepository\Domain\Utility\NodePaths;
-use Neos\Eel\FlowQuery\FlowQuery;
+use Neos\ContentRepository\Core\Projection\ContentGraph\Filter\FindClosestNodeFilter;
+use Neos\ContentRepository\Core\Projection\ContentGraph\Filter\FindReferencesFilter;
+use Neos\ContentRepository\Core\Projection\ContentGraph\Filter\FindSucceedingSiblingNodesFilter;
+use Neos\ContentRepository\Core\Projection\ContentGraph\Node;
+use Neos\ContentRepository\Core\Projection\ContentGraph\VisibilityConstraints;
+use Neos\ContentRepository\Core\SharedModel\ContentRepository\ContentRepositoryId;
+use Neos\ContentRepository\Core\SharedModel\Node\NodeAddress;
+use Neos\ContentRepositoryRegistry\ContentRepositoryRegistry;
+use Neos\ContentRepositoryRegistry\SubgraphCachingInMemory\SubgraphCachePool;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\ActionRequest;
-use Neos\Flow\Mvc\ActionResponse;
-use Neos\Flow\Mvc\Controller\Arguments;
-use Neos\Flow\Mvc\Controller\ControllerContext;
-use Neos\Flow\Security\Account;
 use Neos\Flow\Security\Authentication\EntryPoint\WebRedirect;
-use Neos\Neos\Domain\Service\ContentContext;
+use Neos\Flow\Security\Context;
+use Neos\Neos\FrontendRouting\NodeUriBuilderFactory;
 use Networkteam\Neos\FrontendLogin\Service\NodeAccessService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Find document node containing login form and redirect there.
- * There are two cases when this entry point is activated:
  *
- * 1. Having a authenticated user which does not have access to requested node
- * 2. The requested node requires an authenticated user with certain access role
+ * This entry point is usually activ when the requested node requires an authenticated user with certain access role
  *
  * @package Networkteam\Neos\FrontendLogin\Security\Authentication\EntryPoint
  */
 class LoginNodeRedirect extends WebRedirect
 {
 
-    /**
-     * @Flow\Inject
-     * @var \Neos\Flow\Security\Context
-     */
-    protected $securityContext;
+    #[Flow\Inject]
+    protected Context $securityContext;
 
-    /**
-     * @Flow\Inject
-     * @var \Neos\Neos\Service\LinkingService
-     */
-    protected $linkingService;
+    #[Flow\Inject]
+    protected ContentRepositoryRegistry $contentRepositoryRegistry;
 
-    /**
-     * @Flow\InjectConfiguration(path="authenticationProviderName")
-     * @var string
-     */
-    protected $authenticationProviderName;
+    #[Flow\Inject]
+    protected SubgraphCachePool $subgraphCachePool;
 
-    /**
-     * @Flow\InjectConfiguration(path="roleToMemberAreaMapping")
-     * @var array
-     */
-    protected $roleToMemberAreaMapping;
-    #[\Neos\Flow\Annotations\Inject]
-    protected \Neos\ContentRepositoryRegistry\ContentRepositoryRegistry $contentRepositoryRegistry;
+    #[Flow\Inject]
+    protected NodeUriBuilderFactory $nodeUriBuilderFactory;
+
+    #[Flow\Inject]
+    protected LoggerInterface $systemLogger;
 
     public function startAuthentication(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $originalRequest = $this->securityContext->getInterceptedRequest();
-
         if ($originalRequest instanceof ActionRequest && $originalRequest->hasArgument('node')) {
-            $contextPath = $originalRequest->getArgument('node');
-            $memberAreaRootNode = $this->getMemberAreaRootNodeForAccount($contextPath, $this->getAccount());
+            $nodeAddress = NodeAddress::fromJsonString((string)$originalRequest->getArgument('node'));
+            $contentRepository = $this->contentRepositoryRegistry->get(ContentRepositoryId::fromString($nodeAddress->contentRepositoryId));
+            // The requested node is not accessible in current security context. Therefor, we need to losen the VisibilityConstraints
+            $structuralSubgraph = $this->subgraphCachePool->getContentSubgraph($contentRepository, $nodeAddress->workspaceName, $nodeAddress->dimensionSpacePoint, VisibilityConstraints::createEmpty());
 
-            if ($memberAreaRootNode instanceof \Neos\ContentRepository\Core\Projection\ContentGraph\Node) {
-                try {
-                    $loginFormPage = $memberAreaRootNode->getProperty('loginFormPage');
-                    if ($loginFormPage instanceof \Neos\ContentRepository\Core\Projection\ContentGraph\Node) {
-                        $uri = $this->createNodeUri($request, $loginFormPage);
+            // Node is genuinely gone (deleted/disabled) - let NodeController throw its usual NodeNotFoundException (404).
+            if ($structuralSubgraph->findNodeById($nodeAddress->aggregateId) === null) {
+                return $response;
+            }
 
-                        return $response
-                            ->withBody(Utils::streamFor(sprintf(
-                                '<html><head><meta http-equiv="refresh" content="0;url=%s"/></head></html>',
-                                htmlentities($uri, ENT_QUOTES, 'utf-8')
-                            )))
-                            ->withStatus(303)
-                            ->withHeader('Location', $uri);
-                    }
-                } catch (\Exception $e) {
+            // find closest memberAreaRoot node to requested node
+            $memberAreaRootNode = $structuralSubgraph->findClosestNode(
+                $nodeAddress->aggregateId,
+                FindClosestNodeFilter::create(nodeTypes: NodeAccessService::MEMBERAREAROOT_NODETYPE_NAME)
+            );
 
-                }
+            // MemberAreaRoot node was not found. Let NodeController throw its usual NodeNotFoundException (404).
+            if ($memberAreaRootNode === null) {
+                return $response;
+            }
+
+            // find login form page defined as reference on memberAreaRoot node
+            $memberAreaLoginFormNode = $structuralSubgraph->findReferences(
+                $memberAreaRootNode->aggregateId,
+                FindReferencesFilter::create(referenceName: 'loginFormPage')
+            )->getNodes()->first();
+
+            // find default login form node by nodeType
+            if ($memberAreaLoginFormNode === null) {
+                $memberAreaLoginFormNode = $structuralSubgraph->findSucceedingSiblingNodes(
+                    $memberAreaRootNode->aggregateId,
+                    FindSucceedingSiblingNodesFilter::create(nodeTypes: 'Networkteam.Neos.FrontendLogin:Mixins.Login')
+                )->first();
+            }
+
+            // Redirect to resolved login document node
+            if ($memberAreaLoginFormNode instanceof Node) {
+                $nodeUriBuilder = $this->nodeUriBuilderFactory->forActionRequest($originalRequest);
+                $resolvedUri = $nodeUriBuilder->uriFor(
+                    NodeAddress::fromNode($memberAreaLoginFormNode),
+                );
+                return $response
+                    ->withBody(Utils::streamFor(sprintf(
+                        '<html><head><meta http-equiv="refresh" content="0;url=%s"/></head></html>',
+                        htmlentities((string)$resolvedUri, ENT_QUOTES, 'utf-8')
+                    )))
+                    ->withStatus(303)
+                    ->withHeader('Location', (string)$resolvedUri);
             }
         }
 
         return $response;
-    }
-
-    /**
-     * Create the frontend URL to a node
-     *
-     * @throws \Neos\Neos\Exception
-     */
-    protected function createNodeUri(ServerRequestInterface $request, \Neos\ContentRepository\Core\Projection\ContentGraph\Node $node, array $arguments = []): string
-    {
-        // initialize uriBuilder
-        $actionRequest = ActionRequest::fromHttpRequest($request);
-        $this->uriBuilder->setRequest($actionRequest);
-
-        $controllerContext = new ControllerContext(
-            $this->uriBuilder->getRequest(),
-            new ActionResponse(),
-            new Arguments([]),
-            $this->uriBuilder
-        );
-
-        // TODO 9.0 migration: !! MEGA DIRTY CODE! Ensure to rewrite this; by getting rid of LegacyContextStub.
-        $contentRepository = $this->contentRepositoryRegistry->get(\Neos\ContentRepository\Core\SharedModel\ContentRepository\ContentRepositoryId::fromString('default'));
-        $workspace = $contentRepository->findWorkspaceByName(\Neos\ContentRepository\Core\SharedModel\Workspace\WorkspaceName::fromString($node->getContext()->workspaceName ?? 'live'));
-        $rootNodeAggregate = $contentRepository->getContentGraph($workspace->workspaceName)->findRootNodeAggregateByType(\Neos\ContentRepository\Core\NodeType\NodeTypeName::fromString('Neos.Neos:Sites'));
-        $subgraph = $contentRepository->getContentGraph($workspace->workspaceName)->getSubgraph(\Neos\ContentRepository\Core\DimensionSpace\DimensionSpacePoint::fromLegacyDimensionArray($node->getContext()->dimensions ?? []), $node->getContext()->invisibleContentShown ? \Neos\ContentRepository\Core\Projection\ContentGraph\VisibilityConstraints::withoutRestrictions() : \Neos\ContentRepository\Core\Projection\ContentGraph\VisibilityConstraints::default());
-
-        return $this->linkingService->createNodeUri(
-            $controllerContext,
-            $node,
-            $subgraph->findNodeById($rootNodeAggregate->nodeAggregateId),
-            'html',
-            true,
-            $arguments
-        );
-    }
-
-    protected function getMemberAreaRootNodeForAccount($contextPath, ?Account $account = null): ?\Neos\ContentRepository\Core\Projection\ContentGraph\Node
-    {
-        $memberAreaRootNode = null;
-        $nodePathAndContext = NodePaths::explodeContextPath($contextPath);
-        $nodePath = $nodePathAndContext['nodePath'];
-        $contentContext = $this->createContext($nodePathAndContext['workspaceName'], $nodePathAndContext['dimensions']);
-        $isAuthenticated = $account instanceof Account;
-
-        if ($isAuthenticated) {
-            // find MemberAreaRoot node authenticated user can access
-            $memberAreaRootNodeType = $this->getMemberAreaNodeTypeForAccount($account);
-            if ($memberAreaRootNodeType) {
-                // TODO 9.0 migration: !! ContentContext::getCurrentSiteNode() is removed in Neos 9.0. Use Subgraph and traverse up to "Neos.Neos:Site" node.
-                $q = new FlowQuery([$contentContext->getCurrentSiteNode()]);
-                $memberAreaRootNode = $q->find(sprintf('[instanceof %s]', $memberAreaRootNodeType))->get(0);
-            }
-        } else {
-            // find node by disabling authorization checks (CSRF token, policies, content security, ...)
-            $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext, &$memberAreaRootNode) {
-                try {
-                    $requestedNode = $contentContext->getNode($nodePath);
-                    if ($requestedNode instanceof \Neos\ContentRepository\Core\Projection\ContentGraph\Node) {
-                        // find closest MemberAreaRoot node starting from requested node an traversing all parents
-                        $q = new FlowQuery([$requestedNode]);
-                        $memberAreaRootNode = $q->closest(sprintf('[instanceof %s]', NodeAccessService::MEMBERAREAROOT_NODETYPE_NAME))->get(0);
-                    }
-                } catch (\Exception $e) {
-                }
-            });
-        }
-
-        return $memberAreaRootNode;
-    }
-
-    protected function createContext($workspaceName, array $dimensions = null): \Neos\Rector\ContentRepository90\Legacy\LegacyContextStub
-    {
-        $contextConfiguration = array(
-            'workspaceName' => $workspaceName,
-            'invisibleContentShown' => false,
-            'inaccessibleContentShown' => true
-        );
-
-        if ($dimensions !== null) {
-            $contextConfiguration['dimensions'] = $dimensions;
-        }
-
-        return new \Neos\Rector\ContentRepository90\Legacy\LegacyContextStub($contextConfiguration);
-    }
-
-    protected function getMemberAreaNodeTypeForAccount(Account $account): ?string
-    {
-        $memberAreaRootNodeType = null;
-        /** @var \Neos\Flow\Security\Policy\Role $role */
-        foreach ($account->getRoles() as $role) {
-            if (!empty($this->roleToMemberAreaMapping[$role->getIdentifier()])) {
-                $memberAreaRootNodeType = $this->roleToMemberAreaMapping[$role->getIdentifier()];
-                break;
-            }
-        }
-        return $memberAreaRootNodeType;
-    }
-
-    /**
-     * Return authenticated FrontendLogin account
-     *
-     * @return Account|null
-     */
-    public function getAccount(): ?Account
-    {
-        if ($this->securityContext->canBeInitialized() === true) {
-            $account = $this->securityContext->getAccountByAuthenticationProviderName($this->authenticationProviderName);
-
-            return $account;
-        }
-
-        return null;
     }
 }

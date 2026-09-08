@@ -1,0 +1,28 @@
+Neos:
+  Flow:
+
+    security:
+      authentication:
+        providers:
+          'Neos.Neos:Backend':
+            requestPatterns:
+              'Networkteam.Neos.FrontendLogin:NeosBackend':
+                pattern: Networkteam\Neos\FrontendLogin\Security\NeosRequestPattern
+          'Networkteam.Neos.FrontendLogin:Frontend':
+            provider: PersistedUsernamePasswordProvider
+            entryPoint: Networkteam\Neos\FrontendLogin\Security\Authentication\EntryPoint\LoginNodeRedirect
+            requestPatterns:
+              'Networkteam.Neos.FrontendLogin:NeosFrontend':
+                pattern: Networkteam\Neos\FrontendLogin\Security\NeosRequestPattern
+                patternOptions:
+                  matchFrontend: true
+
+    mvc:
+      routes:
+        'Networkteam.Neos.FrontendLogin': true
+
+    http:
+      middlewares:
+        nodeReadAccess:
+          position: 'after securityEntryPoint'
+          middleware: Networkteam\Neos\FrontendLogin\Http\Middleware\NodeReadAccessMiddleware

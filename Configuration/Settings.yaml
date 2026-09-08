@@ -1,51 +1,18 @@
-Neos:
-  Flow:
-    security:
-      authentication:
-        providers:
-          'Neos.Neos:Backend':
-            requestPatterns:
-              'Networkteam.Neos.FrontendLogin:NeosBackend':
-                pattern: Networkteam\Neos\FrontendLogin\Security\NeosRequestPattern
-          'Networkteam.Neos.FrontendLogin:Frontend':
-            provider: PersistedUsernamePasswordProvider
-            entryPoint: Networkteam\Neos\FrontendLogin\Security\Authentication\EntryPoint\LoginNodeRedirect
-            requestPatterns:
-              'Networkteam.Neos.FrontendLogin:NeosFrontend':
-                pattern: Networkteam\Neos\FrontendLogin\Security\NeosRequestPattern
-                patternOptions:
-                  matchFrontend: true
-    mvc:
-      routes:
-        'Networkteam.Neos.FrontendLogin': true
-
-  Neos:
-    userInterface:
-      translation:
-        autoInclude:
-          Networkteam.Neos.FrontendLogin:
-            - 'NodeTypes/*'
-            - Main
-    fusion:
-      autoInclude:
-        'Networkteam.Neos.FrontendLogin': true
-    nodeTypes:
-      groups:
-        frontendLogin:
-          label: 'Frontend-Login'
-          icon: 'fas fa-user-lock'
-
-  Fusion:
-    defaultContext:
-      Networkteam.Neos.FrontendLogin.Hash: \Networkteam\Neos\FrontendLogin\Eel\HashHelper
-      Networkteam.Neos.FrontendLogin.User: \Networkteam\Neos\FrontendLogin\Eel\UserHelper
-      Networkteam.Neos.FrontendLogin.Locale: \Networkteam\Neos\FrontendLogin\Eel\LocaleHelper
-
 Networkteam:
   Neos:
     FrontendLogin:
+
       redirectOnLoginLogoutExceptionUri: '/'
       authenticationProviderName: 'Networkteam.Neos.FrontendLogin:Frontend'
-      # role identifier to memberAreaNodeType mapping
-      roleToMemberAreaMapping:
-        'Networkteam.Neos.FrontendLogin:FrontendUser': 'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot'
+      
+      # When requesting a node with an authenticated account but not having the required ReadNodePrivelege, the request is redirected to the first accessible member area in site
+      redirectToAccessibleMemberArea: false
+
+      # Add a list of subtree tags for a nodeType by role. Max 36 charcater and lower case only, @see \Neos\ContentRepository\Core\Feature\SubtreeTagging\Dto\SubtreeTag
+      # 
+      # roleSubtree:
+      #   'Some.Package.Key:SomeRoleName':
+      #     nodeType: 'Some.Package.Key:MemberAreaRoot'
+      #     subtreeTags: ['some-subtree-tag']
+      roleSubtree: []
+        
