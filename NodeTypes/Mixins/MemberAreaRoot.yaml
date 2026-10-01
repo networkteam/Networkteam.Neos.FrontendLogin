@@ -13,12 +13,6 @@
     group: frontendLogin
 
   properties:
-    accessRoles:
-      validation:
-        'Neos.Neos/Validation/NotEmptyValidator': []
-      ui:
-        inspector:
-          group: 'frontendLogin'
     loginFormPage:
       type: reference
       ui:
