@@ -21,7 +21,7 @@ use Neos\Flow\Security\Cryptography\HashService;
  */
 class RememberedBrowserService
 {
-    const COOKIE_NAME_PREFIX = 'Networkteam_Neos_FrontendLogin_SecondFactor_';
+    const COOKIE_NAME_PREFIX = 'Nwt_Neos_FrontendLogin_2FA_';
 
     /**
      * @Flow\Inject
@@ -42,6 +42,14 @@ class RememberedBrowserService
      * @var string|null
      */
     protected $duration;
+
+    /**
+     * Whether the cookie gets the Secure flag; only disable it for local development without HTTPS
+     *
+     * @Flow\InjectConfiguration(path="secondFactor.rememberBrowser.cookie.secure")
+     * @var bool
+     */
+    protected $secureCookie = true;
 
     public function isEnabled(): bool
     {
@@ -67,7 +75,7 @@ class RememberedBrowserService
             $expiry->getTimestamp() - $now->getTimestamp(),
             null,
             '/',
-            true,
+            (bool)$this->secureCookie,
             true,
             Cookie::SAMESITE_LAX
         );

@@ -69,6 +69,19 @@ class RememberedBrowserServiceTest extends UnitTestCase
     /**
      * @test
      */
+    public function secureFlagCanBeDisabledBySetting(): void
+    {
+        $this->inject($this->service, 'secureCookie', false);
+
+        $cookie = $this->service->createCookie($this->createAccount('alice', 'hash'), $this->now);
+
+        self::assertFalse($cookie->isSecure());
+        self::assertTrue($cookie->isHttpOnly());
+    }
+
+    /**
+     * @test
+     */
     public function rememberedCookieIsAccepted(): void
     {
         $account = $this->createAccount('alice', 'hash-1');

@@ -207,6 +207,19 @@ The browser gets a signed, `HttpOnly`, `Secure`, `SameSite=Lax` cookie per accou
 account's credentials source and the revocation marker of the backend, so a password change or a changed marker
 requires the code again at the next login. Logout keeps the cookie.
 
+Browsers drop `Secure` cookies received over plain HTTP. For a local development setup without HTTPS, disable the flag
+in the Development context only:
+
+```yaml
+Networkteam:
+  Neos:
+    FrontendLogin:
+      secondFactor:
+        rememberBrowser:
+          cookie:
+            secure: false
+```
+
 ## Password reset
 
 To give your frontend users the possibility to reset there password you can install and use the

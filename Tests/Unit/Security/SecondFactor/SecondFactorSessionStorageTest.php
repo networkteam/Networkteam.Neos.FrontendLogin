@@ -2,7 +2,6 @@
 namespace Networkteam\Neos\FrontendLogin\Tests\Unit\Security\SecondFactor;
 
 use Neos\Flow\Security\Account;
-use Neos\Flow\Session\SessionManagerInterface;
 use Neos\Flow\Session\TransientSession;
 use Neos\Flow\Tests\UnitTestCase;
 use Networkteam\Neos\FrontendLogin\Security\SecondFactor\SecondFactorSessionStorage;
@@ -16,11 +15,9 @@ class SecondFactorSessionStorageTest extends UnitTestCase
     protected function setUp(): void
     {
         $this->session = new TransientSession();
-        $sessionManager = $this->createMock(SessionManagerInterface::class);
-        $sessionManager->method('getCurrentSession')->willReturn($this->session);
 
         $this->storage = new SecondFactorSessionStorage();
-        $this->inject($this->storage, 'sessionManager', $sessionManager);
+        $this->inject($this->storage, 'session', $this->session);
     }
 
     /**

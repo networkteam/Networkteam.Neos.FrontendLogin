@@ -59,3 +59,7 @@ Networkteam:
           # ISO 8601 duration (e.g. 'P30D') a browser may skip the second factor after "remember this browser" was
           # ticked. Empty disables the feature.
           duration: ''
+          cookie:
+            # Set the Secure flag on the cookie. Browsers drop Secure cookies received over plain HTTP, so only
+            # disable it for local development without HTTPS.
+            secure: true

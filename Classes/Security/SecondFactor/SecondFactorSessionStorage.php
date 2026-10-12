@@ -8,7 +8,6 @@ namespace Networkteam\Neos\FrontendLogin\Security\SecondFactor;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Security\Account;
 use Neos\Flow\Session\SessionInterface;
-use Neos\Flow\Session\SessionManagerInterface;
 
 /**
  * Second factor state of the current session
@@ -26,9 +25,9 @@ class SecondFactorSessionStorage
 
     /**
      * @Flow\Inject
-     * @var SessionManagerInterface
+     * @var SessionInterface
      */
-    protected $sessionManager;
+    protected $session;
 
     public function startChallenge(Account $account, string $redirectTarget): void
     {
@@ -76,38 +75,29 @@ class SecondFactorSessionStorage
 
     public function reset(): void
     {
-        $session = $this->sessionManager->getCurrentSession();
-        if ($session->isStarted()) {
-            $session->putData(self::SESSION_KEY, []);
+        if ($this->session->isStarted()) {
+            $this->session->putData(self::SESSION_KEY, []);
         }
     }
 
     protected function getData(): array
     {
-        $session = $this->sessionManager->getCurrentSession();
-        if (!$session->isStarted() || !$session->hasKey(self::SESSION_KEY)) {
+        if (!$this->session->isStarted() || !$this->session->hasKey(self::SESSION_KEY)) {
             return [];
         }
 
-        $data = $session->getData(self::SESSION_KEY);
+        $data = $this->session->getData(self::SESSION_KEY);
 
         return is_array($data) ? $data : [];
     }
 
     protected function putData(array $data): void
     {
-        $session = $this->getStartedSession();
-        $session->putData(self::SESSION_KEY, $data);
-    }
-
-    protected function getStartedSession(): SessionInterface
-    {
-        $session = $this->sessionManager->getCurrentSession();
-        if (!$session->isStarted()) {
-            $session->start();
+        if (!$this->session->isStarted()) {
+            $this->session->start();
         }
 
-        return $session;
+        $this->session->putData(self::SESSION_KEY, $data);
     }
 
     protected function getAccountKey(Account $account): string
