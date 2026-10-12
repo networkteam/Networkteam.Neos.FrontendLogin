@@ -48,7 +48,7 @@ class SecondFactorMiddlewareTest extends UnitTestCase
         $this->securityContext = $this->createMock(SecurityContext::class);
         $this->securityContext->method('canBeInitialized')->willReturn(true);
         $this->secondFactorService = $this->createMock(SecondFactorService::class);
-        $this->secondFactorService->method('getCodeFormUri')->willReturn('/frontend-login/second-factor');
+        $this->secondFactorService->method('getCodeFormUri')->willReturn('/frontend-login/2fa');
         $this->sessionStorage = $this->createMock(SecondFactorSessionStorage::class);
 
         $this->middleware = new SecondFactorMiddleware();
@@ -168,7 +168,7 @@ class SecondFactorMiddlewareTest extends UnitTestCase
 
         self::assertFalse($this->handlerCalled);
         self::assertSame(303, $response->getStatusCode());
-        self::assertSame('/frontend-login/second-factor', $response->getHeaderLine('Location'));
+        self::assertSame('/frontend-login/2fa', $response->getHeaderLine('Location'));
     }
 
     /**

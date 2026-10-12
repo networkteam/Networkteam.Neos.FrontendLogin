@@ -1,6 +1,6 @@
 -
   name: 'Frontend Login Second Factor Form'
-  uriPattern: 'frontend-login/second-factor'
+  uriPattern: 'frontend-login/2fa'
   defaults:
     '@package': 'Networkteam.Neos.FrontendLogin'
     '@controller': 'Authentication'
@@ -10,7 +10,7 @@
 
 -
   name: 'Frontend Login Second Factor Verify'
-  uriPattern: 'frontend-login/second-factor/verify'
+  uriPattern: 'frontend-login/2fa/verify'
   defaults:
     '@package': 'Networkteam.Neos.FrontendLogin'
     '@controller': 'Authentication'
@@ -20,7 +20,7 @@
 
 -
   name: 'Frontend Login Second Factor Resend'
-  uriPattern: 'frontend-login/second-factor/resend'
+  uriPattern: 'frontend-login/2fa/resend'
   defaults:
     '@package': 'Networkteam.Neos.FrontendLogin'
     '@controller': 'Authentication'

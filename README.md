@@ -152,7 +152,7 @@ roles:
 
 After the password check the package can ask for a second factor, e.g. a one-time code sent by email. Until the
 code is verified, every request of the authenticated frontend user is redirected to a code form at
-`/frontend-login/second-factor`. Only the code form, "send new code" and logout are reachable.
+`/frontend-login/2fa`. Only the code form, "send new code" and logout are reachable.
 
 ### Backend
 
