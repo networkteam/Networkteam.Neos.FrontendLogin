@@ -204,7 +204,7 @@ class AuthenticationController extends AbstractAuthenticationController
     {
         $account = $this->getFrontendAccount();
         if ($account !== null && $this->secondFactorService->isRequired($account)) {
-            $redirectTarget = $originalRequest !== null ? (string)$originalRequest->getHttpRequest()->getUri() : $this->getRedirectAfterLoginUri();
+            $redirectTarget = $originalRequest !== null ? $this->buildUriForRequest($originalRequest) : $this->getRedirectAfterLoginUri();
             $httpRequest = $this->request->getHttpRequest();
 
             if ($this->secondFactorService->startChallenge($account, $redirectTarget, $httpRequest)) {
@@ -219,6 +219,26 @@ class AuthenticationController extends AbstractAuthenticationController
         }
 
         $this->redirectToUri($this->getRedirectAfterLoginUri());
+    }
+
+    /**
+     * Build the URI of a request intercepted by the security framework. The intercepted request comes from the
+     * session, which does not keep the HTTP request, so the URI is built from its controller, action and arguments
+     * (like redirectToRequest() does).
+     */
+    protected function buildUriForRequest(ActionRequest $request): string
+    {
+        $packageKey = $request->getControllerPackageKey();
+        $subpackageKey = $request->getControllerSubpackageKey();
+        if ($subpackageKey !== null) {
+            $packageKey .= '\\' . $subpackageKey;
+        }
+
+        return $this->uriBuilder
+            ->reset()
+            ->setCreateAbsoluteUri(true)
+            ->setFormat($request->getFormat())
+            ->uriFor($request->getControllerActionName(), $request->getArguments(), $request->getControllerName(), $packageKey);
     }
 
     protected function getRedirectAfterLoginUri(): string
