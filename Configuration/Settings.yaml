@@ -18,6 +18,11 @@ Neos:
     mvc:
       routes:
         'Networkteam.Neos.FrontendLogin': true
+    http:
+      middlewares:
+        'Networkteam.Neos.FrontendLogin:SecondFactor':
+          position: 'after securityEntryPoint'
+          middleware: 'Networkteam\Neos\FrontendLogin\Http\SecondFactorMiddleware'
 
   Neos:
     userInterface:
@@ -49,3 +54,8 @@ Networkteam:
       # role identifier to memberAreaNodeType mapping
       roleToMemberAreaMapping:
         'Networkteam.Neos.FrontendLogin:FrontendUser': 'Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot'
+      secondFactor:
+        rememberBrowser:
+          # ISO 8601 duration (e.g. 'P30D') a browser may skip the second factor after "remember this browser" was
+          # ticked. Empty disables the feature.
+          duration: ''

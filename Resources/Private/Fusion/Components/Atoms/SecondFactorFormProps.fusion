@@ -1,0 +1,49 @@
+prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.SecondFactorFormProps) < prototype(Neos.Fusion:Component) {
+    verifyUri = Neos.Fusion:UriBuilder {
+        package = 'Networkteam.Neos.FrontendLogin'
+        controller = 'Authentication'
+        action = 'verifySecondFactor'
+    }
+
+    resendUri = Neos.Fusion:UriBuilder {
+        package = 'Networkteam.Neos.FrontendLogin'
+        controller = 'Authentication'
+        action = 'resendSecondFactor'
+    }
+
+    logoutUri = Neos.Fusion:UriBuilder {
+        package = 'Networkteam.Neos.FrontendLogin'
+        controller = 'Authentication'
+        action = 'logout'
+    }
+
+    csrfToken = ${Security.csrfToken()}
+    rememberBrowserEnabled = ${!String.isBlank(Configuration.setting('Networkteam.Neos.FrontendLogin.secondFactor.rememberBrowser.duration'))}
+
+    flashMessages = Networkteam.Neos.FrontendLogin:FlashMessages
+    labels = Neos.Fusion:DataStructure {
+        headline = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.secondfactorform.headline'
+        }
+        description = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.secondfactorform.description'
+        }
+        code = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.secondfactorform.code'
+        }
+        submit = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.secondfactorform.submit'
+        }
+        rememberBrowser = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.secondfactorform.rememberBrowser'
+        }
+        resend = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.secondfactorform.resend'
+        }
+        cancel = Networkteam.Neos.FrontendLogin:TranslatedValue {
+            id = 'components.atoms.secondfactorform.cancel'
+        }
+    }
+
+    renderer = ''
+}
