@@ -45,5 +45,16 @@ prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.SecondFactorFormProps)
         }
     }
 
+    # The renderer will hold the session's CSRF token and flash messages, so it must
+    # never be cached. Keep this when overriding the prototype.
+    @cache {
+        mode = 'uncached'
+        context {
+            1 = 'node'
+            2 = 'documentNode'
+            3 = 'site'
+        }
+    }
+
     renderer = ''
 }

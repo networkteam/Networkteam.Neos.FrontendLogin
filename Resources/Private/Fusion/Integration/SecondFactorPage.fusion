@@ -8,15 +8,4 @@ prototype(Networkteam.Neos.FrontendLogin:SecondFactorPage) < prototype(Neos.Neos
         @position = 'after bodyTag'
         form = Networkteam.Neos.FrontendLogin:Components.Atoms.SecondFactorForm
     }
-
-    # Neos.Neos:Page is cached per node. The code page holds the session's CSRF token and flash messages, so it must
-    # never be cached. Keep this when overriding the prototype.
-    @cache {
-        mode = 'uncached'
-        context {
-            1 = 'node'
-            2 = 'documentNode'
-            3 = 'site'
-        }
-    }
 }
