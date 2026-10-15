@@ -1,0 +1,4 @@
+# Marks the root document of a portal. The second factor code page is rendered with the closest portal root of the
+# account's member area as context node, so it uses the portal's layout. Without a portal root the site node is used.
+'Networkteam.Neos.FrontendLogin:Mixins.PortalRoot':
+  abstract: true

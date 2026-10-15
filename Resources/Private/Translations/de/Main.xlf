@@ -38,6 +38,50 @@
                 <source>The login could not be performed with the given credentials.</source>
                 <target>Mit den eingegebenen Zugangsdaten konnte die Anmeldung nicht durchgeführt werden.</target>
             </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.headline" xml:space="preserve">
+                <source>Confirm your login</source>
+                <target>Anmeldung bestätigen</target>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.description" xml:space="preserve">
+                <source>We have sent you a one-time code. Please enter it to complete your login.</source>
+                <target>Wir haben Ihnen einen Einmal-Code gesendet. Bitte geben Sie ihn ein, um die Anmeldung abzuschließen.</target>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.code" xml:space="preserve">
+                <source>Code</source>
+                <target>Code</target>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.submit" xml:space="preserve">
+                <source>Confirm</source>
+                <target>Bestätigen</target>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.rememberBrowser" xml:space="preserve">
+                <source>Remember this browser</source>
+                <target>Diesen Browser merken</target>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.resend" xml:space="preserve">
+                <source>Send new code</source>
+                <target>Neuen Code senden</target>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.cancel" xml:space="preserve">
+                <source>Cancel</source>
+                <target>Abbrechen</target>
+            </trans-unit>
+            <trans-unit id="secondFactor.verify.failed.title" xml:space="preserve">
+                <source>Invalid code!</source>
+                <target>Ungültiger Code!</target>
+            </trans-unit>
+            <trans-unit id="secondFactor.verify.failed.body" xml:space="preserve">
+                <source>The code is wrong or has expired.</source>
+                <target>Der Code ist falsch oder abgelaufen.</target>
+            </trans-unit>
+            <trans-unit id="secondFactor.resend.sent.title" xml:space="preserve">
+                <source>Code sent</source>
+                <target>Code gesendet</target>
+            </trans-unit>
+            <trans-unit id="secondFactor.resend.sent.body" xml:space="preserve">
+                <source>A new code has been sent.</source>
+                <target>Ein neuer Code wurde gesendet.</target>
+            </trans-unit>
             <trans-unit id="loginhandler.inbackend" xml:space="preserve">
                 <source>Form is disabled in backend mode.</source>
                 <target>Das Formular ist im Backend-Modus deaktiviert.</target>

@@ -15,6 +15,10 @@ roles:
 
   'Networkteam.Neos.FrontendLogin:FirstSuccessfulAuthentication':
 
+  # Marker role without privileges: accounts with this role must pass a second factor after the password check
+  # (see AbstractRoleBasedSecondFactorProvider). Grant it e.g. in the authentication provider.
+  'Networkteam.Neos.FrontendLogin:SecondFactorRequired':
+
   'Neos.Flow:Everybody':
     privileges:
       -

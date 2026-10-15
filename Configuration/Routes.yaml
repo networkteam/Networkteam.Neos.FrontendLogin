@@ -1,4 +1,34 @@
 -
+  name: 'Frontend Login Second Factor Form'
+  uriPattern: 'frontend-login/2fa'
+  defaults:
+    '@package': 'Networkteam.Neos.FrontendLogin'
+    '@controller': 'Authentication'
+    '@action': 'secondFactor'
+    '@format': 'html'
+  httpMethods: ['GET']
+
+-
+  name: 'Frontend Login Second Factor Verify'
+  uriPattern: 'frontend-login/2fa/verify'
+  defaults:
+    '@package': 'Networkteam.Neos.FrontendLogin'
+    '@controller': 'Authentication'
+    '@action': 'verifySecondFactor'
+    '@format': 'html'
+  httpMethods: ['POST']
+
+-
+  name: 'Frontend Login Second Factor Resend'
+  uriPattern: 'frontend-login/2fa/resend'
+  defaults:
+    '@package': 'Networkteam.Neos.FrontendLogin'
+    '@controller': 'Authentication'
+    '@action': 'resendSecondFactor'
+    '@format': 'html'
+  httpMethods: ['POST']
+
+-
   name: 'Frontend Login Form'
   uriPattern: 'frontend-login/{@action}.{@format}'
   defaults:

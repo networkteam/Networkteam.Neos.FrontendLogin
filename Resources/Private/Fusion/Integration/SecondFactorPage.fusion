@@ -1,0 +1,11 @@
+# Rendered by AuthenticationController::secondFactorAction() with the account's portal root as context node.
+# Sites override Networkteam.Neos.FrontendLogin:SecondFactorPage to wrap the form in their page layout.
+networkteamFrontendLoginSecondFactor = Networkteam.Neos.FrontendLogin:SecondFactorPage
+
+prototype(Networkteam.Neos.FrontendLogin:SecondFactorPage) < prototype(Neos.Neos:Page) {
+    body >
+    body = Neos.Fusion:Join {
+        @position = 'after bodyTag'
+        form = Networkteam.Neos.FrontendLogin:Components.Atoms.SecondFactorForm
+    }
+}

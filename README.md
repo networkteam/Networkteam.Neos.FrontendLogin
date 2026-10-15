@@ -15,6 +15,7 @@ as the deprecated parts are not yet removed. But be aware of breaking changes in
 * Redirect to configured login form when a protected page is requested without valid login.
   After successful login you will be redirected to initially requested page (referer).
 * Multiple member areas with different access roles are possible
+* Optional second factor (e.g. a one-time code sent by email) with a pluggable backend
 
 ## Installation
 
@@ -145,6 +146,78 @@ roles:
 
   'Neos.Neos:AbstractEditor':
     parentRoles: [ 'Your.Package:UserWithFrontendAccess' ]
+```
+
+## Second factor
+
+After the password check the package can ask for a second factor, e.g. a one-time code sent by email. Until the
+code is verified, every request of the authenticated frontend user is redirected to a code form at
+`/frontend-login/2fa`. Only the code form, "send new code" and logout are reachable.
+
+### Backend
+
+The package does not generate, send or store codes. Bind your own implementation of
+`Networkteam\Neos\FrontendLogin\Security\SecondFactor\SecondFactorProviderInterface` in `Objects.yaml`:
+
+```yaml
+Networkteam\Neos\FrontendLogin\Security\SecondFactor\SecondFactorProviderInterface:
+  className: Your\Package\Security\EmailCodeSecondFactorProvider
+```
+
+* `isRequired(Account)`: whether the account has to pass a second factor
+* `sendCode(Account)`: deliver a new code (called once when the challenge starts and on "send new code")
+* `verifyCode(Account, string)`: check the entered code. Expiry, attempt limits and throttling belong here.
+* `getRememberRevocationMarker(Account)`: a value that invalidates all remembered browsers of the account when it
+  changes (e.g. a "browser trust reset at" timestamp), see below
+
+The default implementation never requires a second factor, so the login behaves as without this feature.
+
+### Code page layout
+
+The code form is rendered with the site's Fusion. The context node is the closest node with the mixin
+`Networkteam.Neos.FrontendLogin:Mixins.PortalRoot` above the member area root of the account (see
+`roleToMemberAreaMapping`), otherwise the site node. Mark the root pages of your portals with the mixin and override the
+page prototype to use your layout:
+
+```neos
+prototype(Networkteam.Neos.FrontendLogin:SecondFactorPage) < prototype(Your.Site:Document.DefaultPage) {
+    body.content = Networkteam.Neos.FrontendLogin:Components.Atoms.SecondFactorForm
+}
+```
+
+The page must not be cached, because it contains the CSRF token and flash messages of the session. The package sets
+`@cache.mode = 'uncached'` on the prototype, keep it when overriding. Use `SecondFactorFormProps` to build your own
+form markup. The page is loaded in the default content dimensions.
+
+### Remember browser
+
+Users may skip the code in a browser for a configured time after ticking "remember this browser". The feature is off by
+default:
+
+```yaml
+Networkteam:
+  Neos:
+    FrontendLogin:
+      secondFactor:
+        rememberBrowser:
+          duration: 'P30D'
+```
+
+The browser gets a signed, `HttpOnly`, `Secure`, `SameSite=Lax` cookie per account. It is bound to a fingerprint of the
+account's credentials source and the revocation marker of the backend, so a password change or a changed marker
+requires the code again at the next login. Logout keeps the cookie.
+
+Browsers drop `Secure` cookies received over plain HTTP. For a local development setup without HTTPS, disable the flag
+in the Development context only:
+
+```yaml
+Networkteam:
+  Neos:
+    FrontendLogin:
+      secondFactor:
+        rememberBrowser:
+          cookie:
+            secure: false
 ```
 
 ## Password reset

@@ -13,6 +13,7 @@ use Neos\Flow\I18n\Service;
 use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\Mvc\Exception\NoSuchArgumentException;
 use Neos\Flow\Mvc\RequestInterface;
+use Neos\Flow\Security\Account;
 use Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController;
 use Neos\Flow\Security\Authentication\TokenInterface;
 use Neos\Flow\Security\Cryptography\HashService;
@@ -20,8 +21,15 @@ use Neos\Flow\Security\Exception\AuthenticationRequiredException;
 use Neos\Flow\Security\Exception\InvalidArgumentForHashGenerationException;
 use Neos\Flow\Security\Exception\InvalidHashException;
 use Neos\Flow\Security\Policy\PolicyService;
+use Neos\Neos\View\FusionView as NeosFusionView;
 use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelper;
 use Networkteam\Neos\FrontendLogin\Helper\FlashMessageHelperFactory;
+use Networkteam\Neos\FrontendLogin\Security\SecondFactor\RememberedBrowserService;
+use Networkteam\Neos\FrontendLogin\Security\SecondFactor\SecondFactorProviderInterface;
+use Networkteam\Neos\FrontendLogin\Security\SecondFactor\SecondFactorService;
+use Networkteam\Neos\FrontendLogin\Security\SecondFactor\SecondFactorSessionStorage;
+use Networkteam\Neos\FrontendLogin\Service\MemberAreaService;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
 class AuthenticationController extends AbstractAuthenticationController
@@ -57,6 +65,36 @@ class AuthenticationController extends AbstractAuthenticationController
      */
     protected $policyService;
 
+    /**
+     * @Flow\Inject
+     * @var SecondFactorService
+     */
+    protected $secondFactorService;
+
+    /**
+     * @Flow\Inject
+     * @var SecondFactorSessionStorage
+     */
+    protected $secondFactorSessionStorage;
+
+    /**
+     * @Flow\Inject
+     * @var SecondFactorProviderInterface
+     */
+    protected $secondFactorProvider;
+
+    /**
+     * @Flow\Inject
+     * @var RememberedBrowserService
+     */
+    protected $rememberedBrowserService;
+
+    /**
+     * @Flow\Inject
+     * @var MemberAreaService
+     */
+    protected $memberAreaService;
+
     public function initializeAction()
     {
         parent::initializeAction();
@@ -81,6 +119,7 @@ class AuthenticationController extends AbstractAuthenticationController
                 $token->setAuthenticationStatus(TokenInterface::NO_CREDENTIALS_GIVEN);
             }
         }
+        $this->secondFactorSessionStorage->reset();
 
         try {
             $redirectAfterLogoutUri = $this->hashService->validateAndStripHmac(
@@ -94,16 +133,116 @@ class AuthenticationController extends AbstractAuthenticationController
     }
 
     /**
+     * Show the second factor code form, rendered with the site Fusion and the account's portal root as context node
+     */
+    public function secondFactorAction(): string
+    {
+        $account = $this->getFrontendAccount();
+        if ($account === null || !$this->secondFactorSessionStorage->isPending($account)) {
+            $this->redirectToUri($this->redirectOnLoginLogoutExceptionUri);
+        }
+
+        $view = new NeosFusionView();
+        $view->setControllerContext($this->controllerContext);
+        $view->setFusionPath('networkteamFrontendLoginSecondFactor');
+        $view->assign('value', $this->memberAreaService->getPortalRootNode($account));
+        $output = $view->render();
+
+        // Neos.Neos:Page renders a complete HTTP message
+        if ($output instanceof ResponseInterface) {
+            $this->response->setStatusCode($output->getStatusCode());
+            foreach ($output->getHeaders() as $headerName => $headerValues) {
+                $this->response->setHttpHeader($headerName, $headerValues);
+            }
+            $output = (string)$output->getBody();
+        }
+        $this->response->setHttpHeader('Cache-Control', 'no-store');
+
+        return $output;
+    }
+
+    public function verifySecondFactorAction(string $code = '', bool $rememberBrowser = false): void
+    {
+        $account = $this->getFrontendAccount();
+        if ($account === null || !$this->secondFactorSessionStorage->isPending($account)) {
+            $this->redirectToUri($this->redirectOnLoginLogoutExceptionUri);
+        }
+
+        if (!$this->secondFactorProvider->verifyCode($account, trim($code))) {
+            $this->getFlashMessageHelper()->addErrorMessage('secondFactor.verify.failed', 1792047611);
+            $this->redirectToUri($this->secondFactorService->getCodeFormUri($this->request->getHttpRequest()));
+        }
+
+        $redirectTarget = $this->secondFactorSessionStorage->getRedirectTarget($account) ?? $this->redirectOnLoginLogoutExceptionUri;
+        $this->secondFactorSessionStorage->markAuthenticated($account);
+
+        if ($rememberBrowser && $this->rememberedBrowserService->isEnabled()) {
+            $this->response->setCookie($this->rememberedBrowserService->createCookie($account));
+        }
+
+        $this->redirectToUri($redirectTarget);
+    }
+
+    public function resendSecondFactorAction(): void
+    {
+        $account = $this->getFrontendAccount();
+        if ($account === null || !$this->secondFactorSessionStorage->isPending($account)) {
+            $this->redirectToUri($this->redirectOnLoginLogoutExceptionUri);
+        }
+
+        $this->secondFactorProvider->sendCode($account);
+        $this->getFlashMessageHelper()->addNoticeMessage('secondFactor.resend.sent', 1792047612);
+
+        $this->redirectToUri($this->secondFactorService->getCodeFormUri($this->request->getHttpRequest()));
+    }
+
+    /**
      * @param ActionRequest $originalRequest The request that was intercepted by the security framework, NULL if there was none
      * @return void
      */
     protected function onAuthenticationSuccess(ActionRequest $originalRequest = null)
     {
+        $account = $this->getFrontendAccount();
+        if ($account !== null && $this->secondFactorService->isRequired($account)) {
+            $redirectTarget = $originalRequest !== null ? $this->buildUriForRequest($originalRequest) : $this->getRedirectAfterLoginUri();
+            $httpRequest = $this->request->getHttpRequest();
+
+            if ($this->secondFactorService->startChallenge($account, $redirectTarget, $httpRequest)) {
+                $this->redirectToUri($this->secondFactorService->getCodeFormUri($httpRequest));
+            }
+            $this->redirectToUri($redirectTarget);
+        }
+
         if ($originalRequest !== null) {
             // Redirect to the location that redirected to the login form because the user was nog logged in
             $this->redirectToRequest($originalRequest);
         }
 
+        $this->redirectToUri($this->getRedirectAfterLoginUri());
+    }
+
+    /**
+     * Build the URI of a request intercepted by the security framework. The intercepted request comes from the
+     * session, which does not keep the HTTP request, so the URI is built from its controller, action and arguments
+     * (like redirectToRequest() does).
+     */
+    protected function buildUriForRequest(ActionRequest $request): string
+    {
+        $packageKey = $request->getControllerPackageKey();
+        $subpackageKey = $request->getControllerSubpackageKey();
+        if ($subpackageKey !== null) {
+            $packageKey .= '\\' . $subpackageKey;
+        }
+
+        return $this->uriBuilder
+            ->reset()
+            ->setCreateAbsoluteUri(true)
+            ->setFormat($request->getFormat())
+            ->uriFor($request->getControllerActionName(), $request->getArguments(), $request->getControllerName(), $packageKey);
+    }
+
+    protected function getRedirectAfterLoginUri(): string
+    {
         try {
             $redirectAfterLoginUri = $this->hashService->validateAndStripHmac(
                 $this->request->getArgument('redirectAfterLoginUri')
@@ -127,7 +266,12 @@ class AuthenticationController extends AbstractAuthenticationController
             $redirectAfterLoginUri = $this->redirectOnLoginLogoutExceptionUri;
         }
 
-        $this->redirectToUri($redirectAfterLoginUri);
+        return $redirectAfterLoginUri;
+    }
+
+    protected function getFrontendAccount(): ?Account
+    {
+        return $this->authenticationManager->getSecurityContext()->getAccountByAuthenticationProviderName($this->authenticationProviderName);
     }
 
     /**
