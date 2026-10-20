@@ -60,13 +60,7 @@ class RememberedBrowserService
     {
         $now = $now ?? new \DateTimeImmutable();
         $expiry = $now->add(new \DateInterval($this->duration));
-
-        $payload = json_encode([
-            'a' => $this->getAccountHash($account),
-            'e' => $expiry->getTimestamp(),
-            'f' => $this->getFingerprint($account)
-        ]);
-        $value = $this->hashService->appendHmac(rtrim(strtr(base64_encode($payload), '+/', '-_'), '='));
+        $value = $this->hashService->appendHmac($this->createPayload($account, $expiry->getTimestamp()));
 
         return new Cookie(
             $this->getCookieName($account),
@@ -101,16 +95,42 @@ class RememberedBrowserService
             return false;
         }
 
-        $data = json_decode((string)base64_decode(strtr($encodedPayload, '-_', '+/')), true);
-        if (!is_array($data) || !isset($data['a'], $data['e'], $data['f'])) {
+        $expiry = $this->getExpiryFromPayload($encodedPayload);
+        if ($expiry === null) {
             return false;
         }
 
         $now = $now ?? new \DateTimeImmutable();
 
-        return hash_equals($this->getAccountHash($account), (string)$data['a'])
-            && (int)$data['e'] > $now->getTimestamp()
-            && hash_equals($this->getFingerprint($account), (string)$data['f']);
+        return $expiry > $now->getTimestamp()
+            && hash_equals($this->createPayload($account, $expiry), $encodedPayload);
+    }
+
+    /**
+     * Build the URL-safe base64 encoded payload of the cookie, before it gets signed
+     */
+    protected function createPayload(Account $account, int $expiry): string
+    {
+        $payload = json_encode([
+            'a' => $this->getAccountHash($account),
+            'e' => $expiry,
+            'f' => $this->getFingerprint($account)
+        ]);
+
+        return rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
+    }
+
+    /**
+     * Read the expiry timestamp from a payload built by createPayload(), null if it cannot be decoded
+     */
+    protected function getExpiryFromPayload(string $encodedPayload): ?int
+    {
+        $data = json_decode((string)base64_decode(strtr($encodedPayload, '-_', '+/')), true);
+        if (!is_array($data) || !isset($data['e'])) {
+            return null;
+        }
+
+        return (int)$data['e'];
     }
 
     protected function getCookieName(Account $account): string
