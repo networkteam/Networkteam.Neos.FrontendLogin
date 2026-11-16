@@ -5,8 +5,10 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use Neos\Flow\Http\ServerRequestAttributes;
 use Neos\Flow\Security\Account;
+use Neos\Flow\Security\Authentication\AuthenticationManagerInterface;
 use Neos\Flow\Security\Authentication\TokenInterface;
 use Neos\Flow\Security\Context as SecurityContext;
+use Neos\Flow\Security\Exception\NoTokensAuthenticatedException;
 use Neos\Flow\Tests\UnitTestCase;
 use Networkteam\Neos\FrontendLogin\Http\SecondFactorMiddleware;
 use Networkteam\Neos\FrontendLogin\Security\SecondFactor\SecondFactorService;
@@ -28,9 +30,19 @@ class SecondFactorMiddlewareTest extends UnitTestCase
     protected $securityContext;
 
     /**
+     * @var AuthenticationManagerInterface|MockObject
+     */
+    protected $authenticationManager;
+
+    /**
      * @var SecondFactorService|MockObject
      */
     protected $secondFactorService;
+
+    /**
+     * Authentication status of the mocked frontend token, changed by the mocked authentication manager
+     */
+    protected int $tokenStatus = TokenInterface::NO_CREDENTIALS_GIVEN;
 
     /**
      * @var SecondFactorSessionStorage|MockObject
@@ -47,12 +59,14 @@ class SecondFactorMiddlewareTest extends UnitTestCase
     {
         $this->securityContext = $this->createMock(SecurityContext::class);
         $this->securityContext->method('canBeInitialized')->willReturn(true);
+        $this->authenticationManager = $this->createMock(AuthenticationManagerInterface::class);
         $this->secondFactorService = $this->createMock(SecondFactorService::class);
         $this->secondFactorService->method('getCodeFormUri')->willReturn('/frontend-login/2fa');
         $this->sessionStorage = $this->createMock(SecondFactorSessionStorage::class);
 
         $this->middleware = new SecondFactorMiddleware();
         $this->inject($this->middleware, 'securityContext', $this->securityContext);
+        $this->inject($this->middleware, 'authenticationManager', $this->authenticationManager);
         $this->inject($this->middleware, 'secondFactorService', $this->secondFactorService);
         $this->inject($this->middleware, 'sessionStorage', $this->sessionStorage);
         $this->inject($this->middleware, 'authenticationProviderName', self::PROVIDER_NAME);
@@ -94,9 +108,10 @@ class SecondFactorMiddlewareTest extends UnitTestCase
     /**
      * @test
      */
-    public function passesThroughWithUnauthenticatedFrontendToken(): void
+    public function passesThroughWithoutCredentials(): void
     {
-        $this->givenFrontendToken(false);
+        $this->givenFrontendToken(TokenInterface::NO_CREDENTIALS_GIVEN);
+        $this->authenticationManager->expects(self::never())->method('authenticate');
         $this->secondFactorService->expects(self::never())->method('isRequired');
 
         $this->assertPassesThrough($this->createRequest('/member-area'));
@@ -105,9 +120,88 @@ class SecondFactorMiddlewareTest extends UnitTestCase
     /**
      * @test
      */
+    public function leavesWaitingCredentialsToAuthenticateAction(): void
+    {
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_NEEDED);
+        $this->authenticationManager->expects(self::never())->method('authenticate');
+        $this->secondFactorService->expects(self::never())->method('isRequired');
+
+        $this->assertPassesThrough($this->createRequest('/frontend-login/authenticate.html', $this->frontendLoginRoute('authenticate'), 'POST'));
+    }
+
+    /**
+     * @test
+     */
+    public function authenticatesWaitingCredentialsAndStartsChallengeOnOtherRoute(): void
+    {
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_NEEDED);
+        $this->givenAuthenticationResult(TokenInterface::AUTHENTICATION_SUCCESSFUL);
+        $this->secondFactorService->method('isRequired')->willReturn(true);
+        $this->sessionStorage->method('getStatus')->willReturn(null);
+        $this->secondFactorService->expects(self::once())->method('startChallenge')
+            ->with($this->account, '/')
+            ->willReturn(true);
+
+        $response = $this->middleware->process($this->createRequest('/member-area', $this->nodeRoute(), 'POST'), $this->handler);
+
+        self::assertFalse($this->handlerCalled);
+        self::assertSame(303, $response->getStatusCode());
+        self::assertSame('/frontend-login/2fa', $response->getHeaderLine('Location'));
+    }
+
+    /**
+     * @test
+     */
+    public function authenticatesWaitingCredentialsAndRedirectsWhilePending(): void
+    {
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_NEEDED);
+        $this->givenAuthenticationResult(TokenInterface::AUTHENTICATION_SUCCESSFUL);
+        $this->secondFactorService->method('isRequired')->willReturn(true);
+        $this->sessionStorage->method('getStatus')->willReturn(SecondFactorSessionStorage::STATUS_NEEDED);
+        $this->secondFactorService->expects(self::never())->method('startChallenge');
+
+        $response = $this->middleware->process($this->createRequest('/member-area', $this->nodeRoute(), 'POST'), $this->handler);
+
+        self::assertFalse($this->handlerCalled);
+        self::assertSame(303, $response->getStatusCode());
+        self::assertSame('/frontend-login/2fa', $response->getHeaderLine('Location'));
+    }
+
+    /**
+     * @test
+     */
+    public function authenticatesWaitingCredentialsAndPassesThroughWithoutSecondFactor(): void
+    {
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_NEEDED);
+        $this->givenAuthenticationResult(TokenInterface::AUTHENTICATION_SUCCESSFUL);
+        $this->secondFactorService->method('isRequired')->willReturn(false);
+
+        $this->assertPassesThrough($this->createRequest('/application-form', $this->nodeRoute(), 'POST'));
+        self::assertSame(TokenInterface::AUTHENTICATION_SUCCESSFUL, $this->tokenStatus);
+    }
+
+    /**
+     * @test
+     */
+    public function continuesAnonymouslyOnWrongCredentials(): void
+    {
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_NEEDED);
+        $this->authenticationManager->expects(self::once())->method('authenticate')
+            ->willReturnCallback(function () {
+                $this->tokenStatus = TokenInterface::WRONG_CREDENTIALS;
+                throw new NoTokensAuthenticatedException('wrong credentials', 1);
+            });
+        $this->secondFactorService->expects(self::never())->method('isRequired');
+
+        $this->assertPassesThrough($this->createRequest('/application-form', $this->nodeRoute(), 'POST'));
+    }
+
+    /**
+     * @test
+     */
     public function passesThroughIfSecondFactorIsNotRequired(): void
     {
-        $this->givenFrontendToken(true);
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_SUCCESSFUL);
         $this->secondFactorService->method('isRequired')->willReturn(false);
 
         $this->assertPassesThrough($this->createRequest('/member-area'));
@@ -118,7 +212,7 @@ class SecondFactorMiddlewareTest extends UnitTestCase
      */
     public function passesThroughIfSecondFactorIsAuthenticated(): void
     {
-        $this->givenFrontendToken(true);
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_SUCCESSFUL);
         $this->secondFactorService->method('isRequired')->willReturn(true);
         $this->sessionStorage->method('getStatus')->willReturn(SecondFactorSessionStorage::STATUS_AUTHENTICATED);
 
@@ -176,7 +270,7 @@ class SecondFactorMiddlewareTest extends UnitTestCase
      */
     public function fallbackStartsChallengeWithRequestUriAndRedirects(): void
     {
-        $this->givenFrontendToken(true);
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_SUCCESSFUL);
         $this->secondFactorService->method('isRequired')->willReturn(true);
         $this->sessionStorage->method('getStatus')->willReturn(null);
         $this->secondFactorService->expects(self::once())->method('startChallenge')
@@ -194,7 +288,7 @@ class SecondFactorMiddlewareTest extends UnitTestCase
      */
     public function fallbackPassesThroughOnRememberedBrowser(): void
     {
-        $this->givenFrontendToken(true);
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_SUCCESSFUL);
         $this->secondFactorService->method('isRequired')->willReturn(true);
         $this->sessionStorage->method('getStatus')->willReturn(null);
         $this->secondFactorService->expects(self::once())->method('startChallenge')->willReturn(false);
@@ -207,7 +301,7 @@ class SecondFactorMiddlewareTest extends UnitTestCase
      */
     public function fallbackDoesNotStartChallengeForLogout(): void
     {
-        $this->givenFrontendToken(true);
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_SUCCESSFUL);
         $this->secondFactorService->method('isRequired')->willReturn(true);
         $this->sessionStorage->method('getStatus')->willReturn(null);
         $this->secondFactorService->expects(self::never())->method('startChallenge');
@@ -217,18 +311,33 @@ class SecondFactorMiddlewareTest extends UnitTestCase
 
     protected function givenPendingChallenge(): void
     {
-        $this->givenFrontendToken(true);
+        $this->givenFrontendToken(TokenInterface::AUTHENTICATION_SUCCESSFUL);
         $this->secondFactorService->method('isRequired')->willReturn(true);
         $this->sessionStorage->method('getStatus')->willReturn(SecondFactorSessionStorage::STATUS_NEEDED);
         $this->secondFactorService->expects(self::never())->method('startChallenge');
     }
 
-    protected function givenFrontendToken(bool $authenticated): void
+    protected function givenFrontendToken(int $status): void
     {
+        $this->tokenStatus = $status;
         $token = $this->createMock(TokenInterface::class);
-        $token->method('isAuthenticated')->willReturn($authenticated);
+        $token->method('getAuthenticationStatus')->willReturnCallback(fn () => $this->tokenStatus);
+        $token->method('isAuthenticated')->willReturnCallback(fn () => $this->tokenStatus === TokenInterface::AUTHENTICATION_SUCCESSFUL);
         $token->method('getAccount')->willReturn($this->account);
         $this->securityContext->method('getAuthenticationTokens')->willReturn([self::PROVIDER_NAME => $token]);
+    }
+
+    protected function givenAuthenticationResult(int $status): void
+    {
+        $this->authenticationManager->expects(self::once())->method('authenticate')
+            ->willReturnCallback(function () use ($status) {
+                $this->tokenStatus = $status;
+            });
+    }
+
+    protected function nodeRoute(): array
+    {
+        return ['@package' => 'Neos.Neos', '@controller' => 'Frontend\\Node', '@action' => 'show'];
     }
 
     protected function frontendLoginRoute(string $action): array
@@ -236,9 +345,9 @@ class SecondFactorMiddlewareTest extends UnitTestCase
         return ['@package' => 'Networkteam.Neos.FrontendLogin', '@controller' => 'Authentication', '@action' => $action];
     }
 
-    protected function createRequest(string $path, array $routingResults = []): ServerRequestInterface
+    protected function createRequest(string $path, array $routingResults = [], string $method = 'GET'): ServerRequestInterface
     {
-        return (new ServerRequest('GET', 'https://example.com' . $path))
+        return (new ServerRequest($method, 'https://example.com' . $path))
             ->withAttribute(ServerRequestAttributes::ROUTING_RESULTS, $routingResults);
     }
 
