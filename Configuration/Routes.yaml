@@ -29,10 +29,23 @@
   httpMethods: ['POST']
 
 -
-  name: 'Frontend Login Form'
-  uriPattern: 'frontend-login/{@action}.{@format}'
+  name: 'Frontend Login Authenticate'
+  uriPattern: 'frontend-login/authenticate.html'
   defaults:
     '@package': 'Networkteam.Neos.FrontendLogin'
     '@controller': 'Authentication'
+    '@action': 'authenticate'
     '@format': 'html'
   appendExceedingArguments: true
+  httpMethods: ['POST']
+
+-
+  name: 'Frontend Login Logout'
+  uriPattern: 'frontend-login/logout.html'
+  defaults:
+    '@package': 'Networkteam.Neos.FrontendLogin'
+    '@controller': 'Authentication'
+    '@action': 'logout'
+    '@format': 'html'
+  appendExceedingArguments: true
+  httpMethods: ['POST']

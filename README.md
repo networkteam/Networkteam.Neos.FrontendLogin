@@ -42,6 +42,23 @@ This package provides a node migration for copying existing internal accessRoles
 ./flow node:migrate 20210419111000 --confirmation true
 ```
 
+### Breaking change: login and logout only accept POST
+
+Since the second factor support, every action of the package has its own route with allowed HTTP methods, and the
+general route `frontend-login/{@action}.{@format}` is gone. The URIs `frontend-login/authenticate.html` and
+`frontend-login/logout.html` stay the same, but both only accept `POST` now, like the Neos backend logout.
+
+Replace plain logout links (`<a href=".../frontend-login/logout.html">`) with a form, e.g.:
+
+```html
+<form action="/frontend-login/logout.html" method="post">
+    <input type="hidden" name="redirectAfterLogoutUri" value="..." />
+    <button type="submit">Logout</button>
+</form>
+```
+
+A `GET` request to these URIs is no longer routed to the package.
+
 ## NodeTypes
 
 **Networkteam.Neos.FrontendLogin:Mixins.MemberAreaRoot**
@@ -152,7 +169,10 @@ roles:
 
 After the password check the package can ask for a second factor, e.g. a one-time code sent by email. Until the
 code is verified, every request of the authenticated frontend user is redirected to a code form at
-`/frontend-login/2fa`. Only the code form, "send new code" and logout are reachable.
+`/frontend-login/2fa`. Only the code form, "send new code" and logout are reachable. Credentials posted to any other
+page than the login action (e.g. a login inside a form) are authenticated before the page is rendered, so they cannot
+skip the code either; with a second factor required, such a request ends at the code form and its other form data is
+lost.
 
 ### Backend
 
