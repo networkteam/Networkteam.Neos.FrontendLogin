@@ -30,7 +30,7 @@
 
 -
   name: 'Frontend Login Authenticate'
-  uriPattern: 'frontend-login/authenticate.html'
+  uriPattern: 'frontend-login/authenticate(.html)'
   defaults:
     '@package': 'Networkteam.Neos.FrontendLogin'
     '@controller': 'Authentication'
@@ -41,7 +41,7 @@
 
 -
   name: 'Frontend Login Logout'
-  uriPattern: 'frontend-login/logout.html'
+  uriPattern: 'frontend-login/logout(.html)'
   defaults:
     '@package': 'Networkteam.Neos.FrontendLogin'
     '@controller': 'Authentication'
