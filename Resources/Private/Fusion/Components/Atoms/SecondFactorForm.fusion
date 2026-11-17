@@ -1,0 +1,42 @@
+prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.SecondFactorForm) < prototype(Networkteam.Neos.FrontendLogin:Components.Atoms.SecondFactorFormProps) {
+    renderer = afx`
+        <div>
+            <h2>{props.labels.headline}</h2>
+            <p>{props.labels.description}</p>
+
+            <div class="flash-messages" @if.hasFlashMessages={props.flashMessages}>
+                <Neos.Fusion:Loop items={props.flashMessages} @children="itemRenderer">
+                    <p><strong>{item.title}</strong> {item.message}</p>
+                </Neos.Fusion:Loop>
+            </div>
+
+            <form action={props.verifyUri} method="post" class="form-horizontal clearfix">
+                <div class="form-group">
+                    <label for="networkteam-neos-frontendlogin-code" class="col-lg-4 control-label">{props.labels.code}:</label>
+                    <input name="code" class="form-control" id="networkteam-neos-frontendlogin-code" type="text" inputmode="numeric" autocomplete="one-time-code" required autofocus />
+                </div>
+                <div class="form-group" @if.rememberBrowserEnabled={props.rememberBrowserEnabled}>
+                    <label for="networkteam-neos-frontendlogin-remember-browser">
+                        <input name="rememberBrowser" value="1" id="networkteam-neos-frontendlogin-remember-browser" type="checkbox" />
+                        {props.labels.rememberBrowser}
+                    </label>
+                </div>
+                <div class="form-group">
+                    <div class="pull-right">
+                        <button class="btn btn-primary">{props.labels.submit}</button>
+                    </div>
+                </div>
+                <input type="hidden" name="__csrfToken" value={props.csrfToken} />
+            </form>
+
+            <form action={props.resendUri} method="post">
+                <input type="hidden" name="__csrfToken" value={props.csrfToken} />
+                <button class="btn btn-link">{props.labels.resend}</button>
+            </form>
+
+            <form action={props.logoutUri} method="post">
+                <button class="btn btn-link">{props.labels.cancel}</button>
+            </form>
+        </div>
+    `
+}

@@ -1,0 +1,2 @@
+Networkteam\Neos\FrontendLogin\Security\SecondFactor\SecondFactorProviderInterface:
+  className: Networkteam\Neos\FrontendLogin\Security\SecondFactor\NoSecondFactorProvider

@@ -18,6 +18,7 @@ use Neos\Flow\Mvc\Controller\ControllerContext;
 use Neos\Flow\Security\Account;
 use Neos\Flow\Security\Authentication\EntryPoint\WebRedirect;
 use Neos\Neos\Domain\Service\ContentContext;
+use Networkteam\Neos\FrontendLogin\Service\MemberAreaService;
 use Networkteam\Neos\FrontendLogin\Service\NodeAccessService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -59,10 +60,10 @@ class LoginNodeRedirect extends WebRedirect
     protected $authenticationProviderName;
 
     /**
-     * @Flow\InjectConfiguration(path="roleToMemberAreaMapping")
-     * @var array
+     * @Flow\Inject
+     * @var MemberAreaService
      */
-    protected $roleToMemberAreaMapping;
+    protected $memberAreaService;
 
     public function startAuthentication(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
@@ -133,11 +134,7 @@ class LoginNodeRedirect extends WebRedirect
 
         if ($isAuthenticated) {
             // find MemberAreaRoot node authenticated user can access
-            $memberAreaRootNodeType = $this->getMemberAreaNodeTypeForAccount($account);
-            if ($memberAreaRootNodeType) {
-                $q = new FlowQuery([$contentContext->getCurrentSiteNode()]);
-                $memberAreaRootNode = $q->find(sprintf('[instanceof %s]', $memberAreaRootNodeType))->get(0);
-            }
+            $memberAreaRootNode = $this->memberAreaService->findMemberAreaRootNodeForAccount($account, $contentContext);
         } else {
             // find node by disabling authorization checks (CSRF token, policies, content security, ...)
             $this->securityContext->withoutAuthorizationChecks(function () use ($nodePath, $contentContext, &$memberAreaRootNode) {
@@ -169,19 +166,6 @@ class LoginNodeRedirect extends WebRedirect
         }
 
         return $this->contextFactory->create($contextConfiguration);
-    }
-
-    protected function getMemberAreaNodeTypeForAccount(Account $account): ?string
-    {
-        $memberAreaRootNodeType = null;
-        /** @var \Neos\Flow\Security\Policy\Role $role */
-        foreach ($account->getRoles() as $role) {
-            if (!empty($this->roleToMemberAreaMapping[$role->getIdentifier()])) {
-                $memberAreaRootNodeType = $this->roleToMemberAreaMapping[$role->getIdentifier()];
-                break;
-            }
-        }
-        return $memberAreaRootNodeType;
     }
 
     /**

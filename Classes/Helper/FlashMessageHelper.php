@@ -6,6 +6,8 @@ namespace Networkteam\Neos\FrontendLogin\Helper;
  ***************************************************************/
 
 use Neos\Error\Messages\Error;
+use Neos\Error\Messages\Message;
+use Neos\Error\Messages\Notice;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\I18n\EelHelper\TranslationHelper;
 use Neos\Flow\Mvc\ActionRequest;
@@ -32,11 +34,24 @@ class FlashMessageHelper
 
     public function addErrorMessage(string $labelId, int $code, array $labelArguments = []): void
     {
+        $this->addMessage(Error::class, $labelId, $code, $labelArguments);
+    }
+
+    public function addNoticeMessage(string $labelId, int $code, array $labelArguments = []): void
+    {
+        $this->addMessage(Notice::class, $labelId, $code, $labelArguments);
+    }
+
+    /**
+     * @param class-string<Message> $messageClassName
+     */
+    protected function addMessage(string $messageClassName, string $labelId, int $code, array $labelArguments = []): void
+    {
         $message = $this->getTranslation(sprintf('%s.body', $labelId), $labelArguments);
         $title = $this->getTranslation(sprintf('%s.title', $labelId), $labelArguments);
-        $error = new Error($message, $code, [], $title);
+        $flashMessage = new $messageClassName($message, $code, [], $title);
 
-        $this->flashMessageService->getFlashMessageContainerForRequest($this->request)->addMessage($error);
+        $this->flashMessageService->getFlashMessageContainerForRequest($this->request)->addMessage($flashMessage);
     }
 
     protected function getTranslation(string $id, array $arguments = []): string

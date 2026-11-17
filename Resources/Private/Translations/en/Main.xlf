@@ -29,6 +29,39 @@
             <trans-unit id="authentication.onAuthenticationFailure.redirectFailed.body" xml:space="preserve">
                 <source>Exception occurred while trying to redirect: {exceptionMessage} ({exceptionCode})</source>
             </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.headline" xml:space="preserve">
+                <source>Confirm your login</source>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.description" xml:space="preserve">
+                <source>We have sent you a one-time code. Please enter it to complete your login.</source>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.code" xml:space="preserve">
+                <source>Code</source>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.submit" xml:space="preserve">
+                <source>Confirm</source>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.rememberBrowser" xml:space="preserve">
+                <source>Remember this browser</source>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.resend" xml:space="preserve">
+                <source>Send new code</source>
+            </trans-unit>
+            <trans-unit id="components.atoms.secondfactorform.cancel" xml:space="preserve">
+                <source>Cancel</source>
+            </trans-unit>
+            <trans-unit id="secondFactor.verify.failed.title" xml:space="preserve">
+                <source>Invalid code!</source>
+            </trans-unit>
+            <trans-unit id="secondFactor.verify.failed.body" xml:space="preserve">
+                <source>The code is wrong or has expired.</source>
+            </trans-unit>
+            <trans-unit id="secondFactor.resend.sent.title" xml:space="preserve">
+                <source>Code sent</source>
+            </trans-unit>
+            <trans-unit id="secondFactor.resend.sent.body" xml:space="preserve">
+                <source>A new code has been sent.</source>
+            </trans-unit>
             <trans-unit id="loginhandler.inbackend" xml:space="preserve">
                 <source>Form is disabled in backend mode.</source>
             </trans-unit>
